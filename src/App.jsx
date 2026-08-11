@@ -29,6 +29,7 @@ import HomePage from "./components/Pages/HomePage";
 import Membership from "./components/Pages/membership";
 import Terms from "./components/Pages/terms";
 import Tariff from "./components/Pages/tariff";
+import ExamResultViewer from "./components/Pages/ExamResultViewer";
 
 // Home page content only
 function Home() {
@@ -59,7 +60,9 @@ export default function App() {
           <Route path="/suggestion" element = {<SuggestionBox />} />
           <Route path="/membership" element = {<Membership />} />
           <Route path="/terms" element = {<Terms />} />
-          <Route path="/tariff" element = {<Tariff />} />        </Routes>
+          <Route path="/tariff" element = {<Tariff />} />
+          <Route path="/exam-result/:id" element={<ExamResultViewer />} />
+        </Routes>
       </main>
       <Footer />
     </Router>
