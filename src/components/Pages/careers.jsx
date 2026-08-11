@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+const API_ORIGIN = API_BASE.replace(/\/api\/?$/, "");
 
 
 const benefits = [
@@ -89,6 +90,7 @@ function formatDate(d) {
 }
 
 function ExamResultsSection() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("written");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -107,7 +109,7 @@ function ExamResultsSection() {
               title: r.title,
               published: formatDate(r.published_at),
               isLatest: r.is_latest,
-              url: r.file_url || "#",
+              url: r.file_url ? API_ORIGIN + r.file_url : "#",
             }))
           );
         } else {
@@ -202,12 +204,16 @@ function ExamResultsSection() {
                 </div>
                 <div className="er-item-date">Published on: {item.published}</div>
               </div>
-              <a href={item.url} className="er-action-btn" target="_blank" rel="noopener noreferrer">
+              <button
+                className="er-action-btn"
+                onClick={() => navigate(`/exam-result/${item.id}`, { state: { title: item.title, published: item.published, url: item.url } })}
+                aria-label={`View results for ${item.title}`}
+              >
                 View Results
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <polyline points="9 18 15 12 9 6"/>
                 </svg>
-              </a>
+              </button>
             </div>
           ))
         )}
