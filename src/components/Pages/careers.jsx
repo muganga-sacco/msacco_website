@@ -3,16 +3,6 @@ import { useNavigate } from "react-router-dom";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 
-const WRITTEN_RESULTS = [
-  { id: 1, title: "Loan Officer – Written Exam Results",        published: "May 20, 2026", isLatest: true,  type: "link", url: "#" },
-  { id: 2, title: "Driver – Written Exam Shortlist",            published: "May 15, 2026", isLatest: false, type: "link", url: "#" },
-  { id: 3, title: "Junior Accountant – Written Exam Shortlist", published: "May 10, 2026", isLatest: false, type: "pdf",  url: "#" },
-];
-
-const ORAL_RESULTS = [
-  { id: 4, title: "Loan Officer – Oral Interview List", published: "May 22, 2026", isLatest: true,  type: "link", url: "#" },
-  { id: 5, title: "IT Officer – Final Results",         published: "May 18, 2026", isLatest: false, type: "pdf",  url: "#" },
-];
 
 const benefits = [
   {
@@ -100,8 +90,38 @@ function formatDate(d) {
 
 function ExamResultsSection() {
   const [activeTab, setActiveTab] = useState("written");
-  const results = activeTab === "written" ? WRITTEN_RESULTS : ORAL_RESULTS;
-  const viewAllLabel = activeTab === "written" ? "View all written exam results" : "View all oral / final results";
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(false);
+    fetch(`${API_BASE}/exam-results?category=${activeTab}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success) {
+          setResults(
+            (json.data || []).map((r) => ({
+              id: r.id,
+              title: r.title,
+              published: formatDate(r.published_at),
+              isLatest: r.is_latest,
+              url: r.file_url || "#",
+            }))
+          );
+        } else {
+          setError(true);
+        }
+      })
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
+  }, [activeTab]);
+
+  const viewAllLabel =
+    activeTab === "written"
+      ? "View all written exam results"
+      : "View all oral / final results";
 
   return (
     <div className="exam-results-section">
@@ -158,50 +178,47 @@ function ExamResultsSection() {
 
       {/* Results list */}
       <div className="er-list">
-        {results.map((item) => (
-          <div className="er-item" key={item.id}>
-            <div className="er-item-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <circle cx="9" cy="14" r="2"/>
-                <path d="M13 20l-2-2 2-2"/>
-              </svg>
-            </div>
-            <div className="er-item-body">
-              <div className="er-item-title">
-                {item.title}
-                {item.isLatest && <span className="er-latest-badge">Latest</span>}
+        {loading ? (
+          <div className="er-state">Loading...</div>
+        ) : error ? (
+          <div className="er-state">Failed to load results. Please try again later.</div>
+        ) : results.length === 0 ? (
+          <div className="er-state">No results published yet. Check back soon.</div>
+        ) : (
+          results.map((item) => (
+            <div className="er-item" key={item.id}>
+              <div className="er-item-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <circle cx="9" cy="14" r="2"/>
+                  <path d="M13 20l-2-2 2-2"/>
+                </svg>
               </div>
-              <div className="er-item-date">Published on: {item.published}</div>
+              <div className="er-item-body">
+                <div className="er-item-title">
+                  {item.title}
+                  {item.isLatest && <span className="er-latest-badge">Latest</span>}
+                </div>
+                <div className="er-item-date">Published on: {item.published}</div>
+              </div>
+              <a href={item.url} className="er-action-btn" target="_blank" rel="noopener noreferrer">
+                View Results
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </a>
             </div>
-            <a href={item.url} className="er-action-btn" target="_blank" rel="noopener noreferrer">
-              {item.type === "pdf" ? (
-                <>
-                  Download PDF
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="7 10 12 15 17 10"/>
-                    <line x1="12" y1="15" x2="12" y2="3"/>
-                  </svg>
-                </>
-              ) : (
-                <>
-                  View Results
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <polyline points="9 18 15 12 9 6"/>
-                  </svg>
-                </>
-              )}
-            </a>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* View all link */}
-      <div className="er-view-all">
-        <a href="#">{viewAllLabel} &gt;</a>
-      </div>
+      {!loading && !error && results.length > 0 && (
+        <div className="er-view-all">
+          <a href="#">{viewAllLabel} &gt;</a>
+        </div>
+      )}
     </div>
   );
 }

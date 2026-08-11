@@ -2737,6 +2737,13 @@ input:focus, select:focus { border-color: #1a4a2e !important; box-shadow: 0 0 0 
         .er-view-all { text-align: center; margin-top: 16px; padding-bottom: 4px; }
         .er-view-all a { font-size: 0.88rem; font-weight: 600; color: #1a4a2e; text-decoration: none; }
         .er-view-all a:hover { text-decoration: underline; }
+        .er-state {
+          text-align: center;
+          padding: 40px 24px;
+          color: #9a9a8a;
+          font-size: 0.9rem;
+          font-weight: 300;
+        }
         @media (max-width: 600px) {
           .er-item { flex-wrap: wrap; gap: 12px; }
           .er-action-btn { width: 100%; justify-content: center; }

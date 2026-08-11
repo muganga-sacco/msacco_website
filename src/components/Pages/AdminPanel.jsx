@@ -924,6 +924,254 @@ function ManageBoard({ user, onBack, onLogout }) {
 // ══════════════════════════════════════════════════════════════════════════
 //  MANAGE CAREERS
 // ══════════════════════════════════════════════════════════════════════════
+
+// ── Exam Result form modal (add / edit a single entry) ───────────────────
+function ExamResultFormModal({ initial, onClose, onSave }) {
+  const isEdit = !!initial;
+  const [form, setForm] = useState(
+    initial
+      ? { ...initial }
+      : { title: "", category: "written", published_at: "", is_latest: false }
+  );
+  const [file, setFile] = useState(null);
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const handleSave = () => {
+    if (!form.title.trim() || !form.published_at) return;
+    // on create, file is required; on edit it's optional
+    if (!isEdit && !file) return;
+    onSave({ ...form, file });
+  };
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal">
+        <div className="modal-header">
+          <div>
+            <div className="modal-title">{isEdit ? "Edit Exam Result" : "Add Exam Result"}</div>
+            <div className="modal-sub">Fill in the result details below</div>
+          </div>
+          <button className="modal-close" onClick={onClose}><CloseIcon /></button>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Title</label>
+          <input className="form-input" placeholder="e.g., Loan Officer – Written Exam Results" value={form.title} onChange={e => set("title", e.target.value)} />
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">Category</label>
+            <select className="form-select" value={form.category} onChange={e => set("category", e.target.value)}>
+              <option value="written">Written Exam Results</option>
+              <option value="oral">Oral Interview / Final Results</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Published Date</label>
+            <input className="form-input" type="date" value={form.published_at} onChange={e => set("published_at", e.target.value)} />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">
+            {isEdit ? "Replace File (PDF / DOC)" : "Upload File (PDF / DOC) *"}
+          </label>
+          <input
+            className="form-input"
+            type="file"
+            accept=".pdf,.doc,.docx"
+            onChange={e => setFile(e.target.files?.[0] || null)}
+            style={{ padding: "8px 12px", cursor: "pointer" }}
+          />
+          {isEdit && initial?.file_url && !file && (
+            <div style={{ fontSize: "0.78rem", color: "#7a7a6a", marginTop: 4 }}>
+              Current file: <a href={initial.file_url} target="_blank" rel="noopener noreferrer" style={{ color: "#1a4a2e" }}>view existing</a>
+            </div>
+          )}
+          {file && (
+            <div style={{ fontSize: "0.78rem", color: "#2d6a4f", marginTop: 4 }}>
+              ✓ {file.name}
+            </div>
+          )}
+        </div>
+
+        <label className="checkbox-row">
+          <input type="checkbox" checked={form.is_latest} onChange={e => set("is_latest", e.target.checked)} />
+          <span className="checkbox-label">Mark as Latest <span style={{ color: "#9a9a8a", fontWeight: 400 }}>(clears Latest from others in same category)</span></span>
+        </label>
+
+        <div className="modal-footer">
+          <button className="cancel-btn" onClick={onClose}>Cancel</button>
+          <button className="submit-btn" onClick={handleSave}>{isEdit ? "Save Changes" : "Add Result"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Exam Results manager modal (the full list + CRUD) ────────────────────
+function ExamResultsModal({ onClose, user }) {
+  const [tab, setTab] = useState("written");
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAdd, setShowAdd] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [deleting, setDeleting] = useState(null);
+  const [fire, Toast] = useToast();
+
+  const loadResults = (category) => {
+    setLoading(true);
+    fetch(`${API_BASE}/exam-results?category=${category}`, { headers: apiHeaders() })
+      .then(r => r.json())
+      .then(res => { if (res.success) setResults(res.data || []); else fire("Failed to load results", "#c0392b"); })
+      .catch(() => fire("Failed to load results", "#c0392b"))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => { loadResults(tab); }, [tab]);
+
+  const handleCreate = async (data) => {
+    try {
+      const fd = new FormData();
+      fd.append("title", data.title);
+      fd.append("category", data.category);
+      fd.append("published_at", data.published_at);
+      fd.append("is_latest", String(data.is_latest));
+      fd.append("file", data.file);
+      const token = localStorage.getItem("accessToken");
+      const r = await fetch(`${API_BASE}/exam-results`, {
+        method: "POST",
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: fd,
+      });
+      const j = await r.json();
+      if (!r.ok || !j.success) throw new Error(j.message || "Create failed");
+      setShowAdd(false);
+      loadResults(tab);
+      fire("✓ Result added!");
+    } catch (e) { fire(e.message, "#c0392b"); }
+  };
+
+  const handleUpdate = async (data) => {
+    try {
+      const fd = new FormData();
+      fd.append("title", data.title);
+      fd.append("category", data.category);
+      fd.append("published_at", data.published_at);
+      fd.append("is_latest", String(data.is_latest));
+      if (data.file) fd.append("file", data.file); // only if a new file was chosen
+      const token = localStorage.getItem("accessToken");
+      const r = await fetch(`${API_BASE}/exam-results/${editing.id}`, {
+        method: "PUT",
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: fd,
+      });
+      const j = await r.json();
+      if (!r.ok || !j.success) throw new Error(j.message || "Update failed");
+      setEditing(null);
+      loadResults(tab);
+      fire("✓ Result updated!");
+    } catch (e) { fire(e.message, "#c0392b"); }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const r = await fetch(`${API_BASE}/exam-results/${deleting.id}`, { method: "DELETE", headers: apiHeaders() });
+      const j = await r.json();
+      if (!r.ok || !j.success) throw new Error(j.message || "Delete failed");
+      setDeleting(null);
+      loadResults(tab);
+      fire("Result removed.", "#c0392b");
+    } catch (e) { fire(e.message, "#c0392b"); }
+  };
+
+  const fmtDate = d => {
+    if (!d) return "";
+    try { return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); }
+    catch { return d; }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal" style={{ maxWidth: 680, width: "100%" }}>
+        <div className="modal-header">
+          <div>
+            <div className="modal-title">Exam Results &amp; Interview Notices</div>
+            <div className="modal-sub">Add, edit or remove published results</div>
+          </div>
+          <button className="modal-close" onClick={onClose}><CloseIcon /></button>
+        </div>
+
+        {/* Tabs */}
+        <div style={{ display: "flex", gap: 0, borderBottom: "2px solid #e4e0d8", marginBottom: 20 }}>
+          {[{ key: "written", label: "Written Exam Results" }, { key: "oral", label: "Oral / Final Results" }].map(t => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              style={{
+                padding: "10px 20px", border: "none", background: tab === t.key ? "#1a4a2e" : "transparent",
+                color: tab === t.key ? "#fff" : "#7a7a6a", fontWeight: 600, fontSize: "0.85rem",
+                cursor: "pointer", borderRadius: "8px 8px 0 0", borderBottom: tab === t.key ? "2px solid #1a4a2e" : "2px solid transparent",
+                marginBottom: -2, fontFamily: "inherit", transition: "all 0.15s"
+              }}
+            >{t.label}</button>
+          ))}
+          <button
+            onClick={() => setShowAdd(true)}
+            style={{
+              marginLeft: "auto", display: "flex", alignItems: "center", gap: 6,
+              padding: "8px 16px", background: "#1a4a2e", color: "#fff",
+              border: "none", borderRadius: 8, fontWeight: 600, fontSize: "0.83rem",
+              cursor: "pointer", fontFamily: "inherit", alignSelf: "center", marginBottom: 4
+            }}
+          ><PlusIcon /> Add Result</button>
+        </div>
+
+        {/* List */}
+        {loading ? (
+          <p style={{ textAlign: "center", padding: "32px 0", color: "#9a9a8a", fontSize: "0.9rem" }}>Loading...</p>
+        ) : results.length === 0 ? (
+          <p style={{ textAlign: "center", padding: "32px 0", color: "#9a9a8a", fontSize: "0.9rem" }}>No results published yet.</p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 0, border: "1px solid #e4e0d8", borderRadius: 12, overflow: "hidden" }}>
+            {results.map((item, idx) => (
+              <div key={item.id} style={{
+                display: "flex", alignItems: "center", gap: 12, padding: "14px 16px",
+                borderBottom: idx < results.length - 1 ? "1px solid #f0ece4" : "none",
+                background: "#fff"
+              }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                    <span style={{ fontWeight: 600, fontSize: "0.9rem", color: "#1a1a14" }}>{item.title}</span>
+                    {item.is_latest && (
+                      <span style={{ background: "#c1440e", color: "#fff", fontSize: "0.65rem", fontWeight: 700, padding: "2px 8px", borderRadius: 20 }}>Latest</span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: "0.78rem", color: "#9a9a8a", marginTop: 2 }}>Published: {fmtDate(item.published_at)}</div>
+                </div>
+                <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                  <button className="edit-btn" onClick={() => setEditing(item)}><EditIcon /> Edit</button>
+                  <button className="delete-btn" onClick={() => setDeleting(item)}><TrashIcon /> Delete</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="modal-footer" style={{ marginTop: 20 }}>
+          <button className="cancel-btn" onClick={onClose}>Close</button>
+        </div>
+      </div>
+
+      {showAdd  && <ExamResultFormModal onClose={() => setShowAdd(false)} onSave={handleCreate} />}
+      {editing  && <ExamResultFormModal initial={editing} onClose={() => setEditing(null)} onSave={handleUpdate} />}
+      {deleting && <ConfirmModal name={deleting.title} onClose={() => setDeleting(null)} onConfirm={handleDelete} />}
+      {Toast}
+    </div>
+  );
+}
+
 function JobModal({ initial, onClose, onSave }) {
   const isEdit = !!initial;
   const [form, setForm] = useState(initial
@@ -989,6 +1237,7 @@ function ManageCareers({ user, onBack, onLogout }) {
   const [showAdd, setShowAdd] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleting, setDeleting] = useState(null);
+  const [showExamResults, setShowExamResults] = useState(false);
   const [fire, Toast] = useToast();
 
   useEffect(() => {
@@ -1032,7 +1281,13 @@ function ManageCareers({ user, onBack, onLogout }) {
       <main className="mgmt-main">
         <div className="mgmt-header">
           <div><h1 className="mgmt-page-title">Job Openings</h1><p className="page-sub">Manage career opportunities</p></div>
-          <button className="add-btn" onClick={() => setShowAdd(true)}><PlusIcon /> Add Job</button>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button className="add-btn" style={{ background: "#2d6a4f" }} onClick={() => setShowExamResults(true)}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" width="16" height="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+              Exam Results
+            </button>
+            <button className="add-btn" onClick={() => setShowAdd(true)}><PlusIcon /> Add Job</button>
+          </div>
         </div>
 
         {loading ? (
@@ -1067,6 +1322,7 @@ function ManageCareers({ user, onBack, onLogout }) {
       {showAdd  && <JobModal onClose={() => setShowAdd(false)} onSave={handleCreate} />}
       {editing  && <JobModal initial={editing} onClose={() => setEditing(null)} onSave={handleUpdate} />}
       {deleting && <ConfirmModal name={deleting.title} onClose={() => setDeleting(null)} onConfirm={handleDelete} />}
+      {showExamResults && <ExamResultsModal user={user} onClose={() => setShowExamResults(false)} />}
       {Toast}
     </div>
   );
