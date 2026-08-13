@@ -104,7 +104,9 @@ function toApiBoardMember(fp) {
   return { name: fp.name, role: (fp.role||"").toLowerCase().replace(/ /g,"_")||"member", bio: fp.bio||"", image_url: fp.image||"", board_type: fp.board_type||"board_of_directors" };
 }
 function toFrontendBoardMember(api) {
-  return { id: api.id, name: api.name, role: (api.role||"").replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase()), image: api.image_url||"", bio: api.bio||"", board_type: api.board_type||"board_of_directors" };
+  const raw = api.image_url || "";
+  const image = raw.startsWith("/") ? API_ORIGIN + raw : raw;
+  return { id: api.id, name: api.name, role: (api.role||"").replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase()), image, bio: api.bio||"", board_type: api.board_type||"board_of_directors" };
 }
 
 function toApiJob(fp) {

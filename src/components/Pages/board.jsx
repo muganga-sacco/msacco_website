@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+const API_ORIGIN = API_BASE.replace(/\/api\/?$/, "");
+
+function resolveImageUrl(url) {
+  if (!url) return "";
+  if (url.startsWith("/")) return API_ORIGIN + url;
+  return url;
+}
 
 const PRINCIPLE_COLORS = [
   { color: "#2d6a4f", bg: "#e8f0eb" },
@@ -44,7 +51,7 @@ function PersonCard({ person, imageHeight = 200 }) {
       <div className="card-photo" style={{ height: imageHeight }}>
         {(person.image || person.image_url) && !imgErr ? (
           <img
-            src={person.image || person.image_url}
+            src={resolveImageUrl(person.image || person.image_url)}
             alt={person.name}
             onError={() => setImgErr(true)}
             style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }}
@@ -66,7 +73,7 @@ function PersonCard({ person, imageHeight = 200 }) {
 
 /* ─── MAIN PAGE ─────────────────────────────────────── */
 function mapMember(m) {
-  return { id: m.id, name: m.name, role: m.role, roleColor: toRoleColor(m.role), bio: m.bio || "", image: m.image_url || "" };
+  return { id: m.id, name: m.name, role: m.role, roleColor: toRoleColor(m.role), bio: m.bio || "", image: resolveImageUrl(m.image_url) };
 }
 
 export default function board() {
@@ -140,7 +147,7 @@ export default function board() {
               {boardMembers.length === 0 ? (
                 <p style={{ gridColumn: "1/-1", textAlign: "center", color: "#9a9a8a", padding: "40px 0" }}>No board members found.</p>
               ) : boardMembers.map((m) => (
-                <PersonCard key={m.id} person={m} imageHeight={190} />
+                <PersonCard key={m.id} person={m} imageHeight={320} />
               ))}
             </div>
           </div>
@@ -157,7 +164,7 @@ export default function board() {
               {supervisoryBoard.length === 0 ? (
                 <p style={{ gridColumn: "1/-1", textAlign: "center", color: "#9a9a8a", padding: "40px 0" }}>No supervisory board members found.</p>
               ) : supervisoryBoard.map((m) => (
-                <PersonCard key={m.id} person={m} imageHeight={190} />
+                <PersonCard key={m.id} person={m} imageHeight={320} />
               ))}
             </div>
           </div>
@@ -174,7 +181,7 @@ export default function board() {
               {managementTeam.length === 0 ? (
                 <p style={{ gridColumn: "1/-1", textAlign: "center", color: "#9a9a8a", padding: "40px 0" }}>No management team found.</p>
               ) : managementTeam.map((m) => (
-                <PersonCard key={m.id} person={m} imageHeight={230} />
+                <PersonCard key={m.id} person={m} imageHeight={320} />
               ))}
             </div>
           </div>
