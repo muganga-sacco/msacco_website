@@ -95,7 +95,7 @@ export default function GuidesAndTutorials() {
               desc: t.description || "",
               duration: t.duration || "",
               videoUrl: t.video_url || null,
-              image: t.thumbnail || getYoutubeThumbnail(t.video_url) || "",
+              image: getYoutubeThumbnail(t.thumbnail) || getYoutubeThumbnail(t.video_url) || "",
               hasPlay: !!t.video_url,
             }))
           );

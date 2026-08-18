@@ -111,7 +111,7 @@ function Modal({ product, onClose }) {
 
         <div style={{ marginBottom: 20 }}>
           <h2 style={{ fontFamily:"'Playfair Display', serif", fontSize:"1.45rem", fontWeight:700, color:"#1a1a14", margin:0 }}>{product.title}</h2>
-          <p style={{ fontSize:"0.95rem", color:"#7a7a6a", margin:"3px 0 0", fontWeight:300 }}>{product.description}</p>
+          {product.description ? <p style={{ fontSize:"0.95rem", color:"#7a7a6a", margin:"3px 0 0", fontWeight:300 }}>{product.description}</p> : null}
         </div>
 
         <div style={{ display:"flex", gap:12, marginBottom:20 }}>
@@ -119,13 +119,15 @@ function Modal({ product, onClose }) {
           <div style={{ flex:1, background:"#e6f2f5", borderRadius:10, padding:"12px 16px" }}>
             <div style={{ fontSize:"0.8rem", color:"#7a7a6a", marginBottom:2, textTransform:"uppercase", letterSpacing:"0.05em" }}>Interest Rate</div>
             <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"2rem", fontWeight:700, color:accent, lineHeight:1 }}>{product.rate}%</div>
-            <div style={{ fontSize:"0.8rem", color:"#7a7a6a" }}>per annum</div>
+            <div style={{ fontSize:"0.8rem", color:"#7a7a6a" }}>{product.rateLabel === "Monthly Interest" ? "per month" : "per annum"}</div>
           </div>
           ) : null}
+          {product.limit ? (
           <div style={{ flex:1, background:"#f5f5f0", borderRadius:10, padding:"12px 16px" }}>
             <div style={{ fontSize:"0.8rem", color:"#7a7a6a", marginBottom:2, textTransform:"uppercase", letterSpacing:"0.05em" }}>Limit</div>
             <div style={{ fontSize:"1.15rem", fontWeight:600, color:"#1a1a14", lineHeight:1.3, marginTop:4 }}>{product.limit}</div>
             </div>
+          ) : null}
             <div className="ms-contact-card">
               <p className="ms-contact-heading">Need assistance?</p>
               <p className="ms-contact-text">
@@ -134,10 +136,25 @@ function Modal({ product, onClose }) {
             </div>
           </div>
 
+        {product.details.overview && (
         <Section title="Overview" accent={accent}>
           <p style={{ fontSize:"0.95rem", color:"#4a4a3a", lineHeight:1.7, margin:0, fontWeight:300 }}>{product.details.overview}</p>
         </Section>
+        )}
 
+        {product.features?.length > 0 && (
+          <Section title="Features" accent={accent}>
+            <ul style={{ margin:0, padding:0, listStyle:"none" }}>
+              {product.features.map((item, i) => (
+                <li key={i} style={{ display:"flex", gap:8, fontSize:"0.92rem", color:"#4a4a3a", padding:"3px 0", fontWeight:300 }}>
+                  <span style={{ color:accent, flexShrink:0 }}>✓</span>{item}
+                </li>
+              ))}
+            </ul>
+          </Section>
+        )}
+
+        {product.details.eligibility?.length > 0 && (
         <Section title="Eligibility" accent={accent}>
           <ul style={{ margin:0, padding:0, listStyle:"none" }}>
             {product.details.eligibility.map((item, i) => (
@@ -147,7 +164,9 @@ function Modal({ product, onClose }) {
             ))}
           </ul>
         </Section>
+        )}
 
+        {product.details.documents?.length > 0 && (
         <Section title="Required Documents" accent={accent}>
           <ul style={{ margin:0, padding:0, listStyle:"none" }}>
             {product.details.documents.map((doc, i) => (
@@ -157,10 +176,13 @@ function Modal({ product, onClose }) {
             ))}
           </ul>
         </Section>
+        )}
 
+        {product.details.process && (
         <Section title="Application Process" accent={accent}>
           <p style={{ fontSize:"0.95rem", color:"#4a4a3a", lineHeight:1.7, margin:0, fontWeight:300 }}>{product.details.process}</p>
         </Section>
+        )}
 
         {product.details.targeted_customers?.length > 0 && (
           <Section title="Targeted Customers" accent={accent}>
@@ -234,19 +256,21 @@ export default function Membership() {
   const toFrontend = (api) => {
     const d = DETAILS_BY_TITLE[api.title] || {};
     const amount = api.max_amount ? `Up to RWF ${Number(api.max_amount).toLocaleString()}` : "";
+    const rateLabel = api.interest_period === "monthly" ? "Monthly Interest" : "Annual Interest";
     return {
       id: api.id,
       imageUrl: api.image_url || "",
       title: api.title,
       description: api.description || "",
       rate: api.interest_rate ? parseFloat(api.interest_rate) : 0,
+      rateLabel,
       limit: amount || "",
       features: api.features || [],
       details: {
         overview: d.overview || api.description || "",
         eligibility: api.eligibility || d.eligibility || [],
         documents: api.required_documents || d.documents || [],
-        process: api.application_process || d.process || "Contact us for more information.",
+        process: api.application_process || d.process || "",
         targeted_customers: api.targeted_customers || [],
         benefits: api.benefits || [],
         required_forms: api.required_forms || [],
@@ -345,7 +369,7 @@ export default function Membership() {
                 {p.rate > 0 ? (
                 <div className="ms-rate-row">
                   <span className="ms-rate-num">{p.rate}%</span>
-                  <span className="ms-rate-label">Annual Interest</span>
+                  <span className="ms-rate-label">{p.rateLabel || "Annual Interest"}</span>
                 </div>
                 ) : null}
                 <div className="ms-card-limit">{p.limit}</div>

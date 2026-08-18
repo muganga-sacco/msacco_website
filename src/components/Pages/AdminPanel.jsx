@@ -19,6 +19,7 @@ const VideoIcon = ({ size = 24 }) => (<svg viewBox="0 0 24 24" fill="none" strok
 const SettingsIcon = ({ size = 24 }) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>);
 const ServerIcon = ({ size = 24 }) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><rect x="2" y="2" width="20" height="8" rx="2" ry="2" /><rect x="2" y="14" width="20" height="8" rx="2" ry="2" /><line x1="6" y1="6" x2="6.01" y2="6" /><line x1="6" y1="18" x2="6.01" y2="18" /></svg>);
 const FileIcon = ({ size = 24 }) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="16 13 12 17 8 13" /></svg>);
+const GlobeIcon = ({ size = 24 }) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>);
 const EyeIcon = ({ open }) => open ? (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="18" height="18"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>) : (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="18" height="18"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></svg>);
 const UserCircleIcon = ({ size = 80 }) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>);
 
@@ -63,6 +64,7 @@ function toApiProduct(fp) {
     title: fp.name || "",
     description: fp.desc || "",
     interest_rate: rawRate ? parseFloat(rawRate) || 0 : 0,
+    interest_period: fp.interestPeriod || "yearly",
     max_amount: rawAmt ? parseInt(rawAmt, 10) || null : null,
     features: Array.isArray(fp.features) ? fp.features.filter(f => String(f || "").trim()) : [],
     is_featured: !!fp.featured,
@@ -87,6 +89,7 @@ function toFrontendProduct(api) {
     name: api.title,
     desc: api.description || "",
     rate: `${api.interest_rate}%`,
+    interestPeriod: api.interest_period || "yearly",
     amount,
     features: api.features || [],
     featured: api.is_featured || false,
@@ -101,10 +104,10 @@ function toFrontendProduct(api) {
 }
 
 function toApiBoardMember(fp) {
-  return { name: fp.name, role: (fp.role||"").toLowerCase().replace(/ /g,"_")||"member", bio: fp.bio||"", image_url: fp.image||"", board_type: fp.board_type||"board_of_directors" };
+  return { name: fp.name, role: (fp.role||"").toLowerCase().replace(/ /g,"_")||"member", bio: fp.bio||"", image_url: fp.image||"", board_type: fp.board_type||"board_of_directors", sort_order: fp.sort_order ?? 0 };
 }
 function toFrontendBoardMember(api) {
- return { id: api.id, name: api.name, role: (api.role||"").replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase()), image: api.image_url||"", bio: api.bio||"", board_type: api.board_type||"board_of_directors" };
+  return { id: api.id, name: api.name, role: (api.role||"").replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase()), image: api.image_url||"", bio: api.bio||"", board_type: api.board_type||"board_of_directors", sort_order: api.sort_order ?? 0 };
 }
 
 function toApiJob(fp) {
@@ -324,6 +327,7 @@ function ProductModal({ initial, onClose, onSave }) {
   const isEdit = !!initial;
   const defaultForm = {
     type: "Loan", name: "", desc: "", rate: "", amount: "",
+    interestPeriod: "yearly",
     features: ["", "", ""], featured: false,
     eligibility: ["", "", ""], requiredDocuments: ["", "", ""], applicationProcess: "",
     imageUrl: "", targetedCustomers: ["", "", ""], benefits: ["", "", ""], requiredForms: ["", "", ""],
@@ -395,9 +399,10 @@ function ProductModal({ initial, onClose, onSave }) {
         <div className="form-group"><label className="form-label">Product Name</label><input className="form-input" placeholder="e.g., Business Loans" value={form.name} onChange={e => updateField("name", e.target.value)} /></div>
         <div className="form-group"><label className="form-label">Description</label><textarea className="form-textarea" placeholder="Brief description of the product" value={form.desc} onChange={e => updateField("desc", e.target.value)} /></div>
         <div className="form-row">
-          <div className="form-group"><label className="form-label">Interest Rate</label><input className="form-input" placeholder="e.g., 12%" value={form.rate} onChange={e => updateField("rate", e.target.value)} /></div>
+          <div className="form-group"><label className="form-label">Interest Rate</label><input className="form-input" placeholder="e.g., 12" value={form.rate} onChange={e => updateField("rate", e.target.value)} /></div>
           <div className="form-group"><label className="form-label">Max Amount</label><input className="form-input" placeholder="e.g., Up to RWF 50M" value={form.amount} onChange={e => updateField("amount", e.target.value)} /></div>
         </div>
+        <div className="form-group"><label className="form-label">Interest Period</label><select className="form-select" value={form.interestPeriod} onChange={e => updateField("interestPeriod", e.target.value)}><option value="yearly">Yearly (per annum)</option><option value="monthly">Monthly</option></select></div>
         <div className="form-group"><label className="form-label">Features</label>
           <div className="dyn-list">{form.features.map((f, i) => (<div className="dyn-row" key={i}><input className="dyn-input" placeholder={`Feature ${i + 1}`} value={f} onChange={e => updateFeat(i, e.target.value)} />{form.features.length > 1 && <button className="dyn-remove" onClick={() => remFeat(i)} type="button">×</button>}</div>))}</div>
           <button className="add-dyn-btn" onClick={addFeat} type="button"><PlusIcon /> Add Feature</button>
@@ -419,14 +424,14 @@ function ProductModal({ initial, onClose, onSave }) {
           <button className="add-dyn-btn" onClick={addBen} type="button"><PlusIcon /> Add Benefit</button>
         </div>
 
-        <div className="form-group"><label className="form-label">Required Forms</label>
-          <div className="dyn-list">{form.requiredForms.map((f, i) => (<div className="dyn-row" key={i}><input className="dyn-input" placeholder={`Form ${i + 1}`} value={f} onChange={e => updateFormField(i, e.target.value)} />{form.requiredForms.length > 1 && <button className="dyn-remove" onClick={() => remFormField(i)} type="button">×</button>}</div>))}</div>
-          <button className="add-dyn-btn" onClick={addFormField} type="button"><PlusIcon /> Add Form</button>
-        </div>
-
         <div className="form-group"><label className="form-label">Required Documents</label>
           <div className="dyn-list">{form.requiredDocuments.map((f, i) => (<div className="dyn-row" key={i}><input className="dyn-input" placeholder={`Document ${i + 1}`} value={f} onChange={e => updateDoc(i, e.target.value)} />{form.requiredDocuments.length > 1 && <button className="dyn-remove" onClick={() => remDoc(i)} type="button">×</button>}</div>))}</div>
           <button className="add-dyn-btn" onClick={addDoc} type="button"><PlusIcon /> Add Document</button>
+        </div>
+
+        <div className="form-group"><label className="form-label">Requirements</label>
+          <div className="dyn-list">{form.requiredForms.map((f, i) => (<div className="dyn-row" key={i}><input className="dyn-input" placeholder={`Form ${i + 1}`} value={f} onChange={e => updateFormField(i, e.target.value)} />{form.requiredForms.length > 1 && <button className="dyn-remove" onClick={() => remFormField(i)} type="button">×</button>}</div>))}</div>
+          <button className="add-dyn-btn" onClick={addFormField} type="button"><PlusIcon /> Add Form</button>
         </div>
 
         <div className="form-group"><label className="form-label">Application Process</label>
@@ -788,7 +793,7 @@ const BOARD_TYPES = [
 
 function BoardMemberModal({ initial, onClose, onSave }) {
   const isEdit = !!initial;
-  const [form, setForm] = useState(initial ? { ...initial } : { name: "", role: "", image: "", bio: "", board_type: "board_of_directors" });
+  const [form, setForm] = useState(initial ? { ...initial } : { name: "", role: "", image: "", bio: "", board_type: "board_of_directors", sort_order: 0 });
   const [imgError, setImgError] = useState(false);
   const [uploading, setUploading] = useState(false);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -830,6 +835,7 @@ function BoardMemberModal({ initial, onClose, onSave }) {
         <div className="form-group"><label className="form-label">Board Type</label><select className="form-select" value={form.board_type} onChange={e => set("board_type", e.target.value)}>{BOARD_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}</select></div>
         <div className="form-group"><label className="form-label">Full Name</label><input className="form-input" placeholder="Dr. John Doe" value={form.name} onChange={e => set("name", e.target.value)} /></div>
         <div className="form-group"><label className="form-label">Role / Position</label><input className="form-input" placeholder="Board Chairperson" value={form.role} onChange={e => set("role", e.target.value)} /></div>
+        <div className="form-group"><label className="form-label">Ranking / Sort Order (1–30, 1 = first)</label><input className="form-input" type="number" min="1" max="30" placeholder="1" value={form.sort_order ?? 0} onChange={e => { const v = parseInt(e.target.value) || 0; set("sort_order", v < 1 ? 1 : v > 30 ? 30 : v); }} /></div>
         <div className="form-group"><label className="form-label">Biography</label><textarea className="form-textarea" placeholder="Brief biography and qualifications" value={form.bio} onChange={e => set("bio", e.target.value)} /></div>
         <div className="modal-footer"><button className="cancel-btn" onClick={onClose}>Cancel</button><button className="submit-btn" onClick={handleSave}>{isEdit ? "Save Changes" : "Add Member"}</button></div>
       </div>
@@ -905,6 +911,7 @@ function ManageBoard({ user, onBack, onLogout }) {
                   <span className="board-avatar-placeholder" style={{ display: m.image ? "none" : "flex" }}><UserCircleIcon size={50} /></span>
                 </div>
                 <div className="board-name">{m.name}</div><div className="board-role">{m.role}</div>
+                {m.sort_order > 0 && <div style={{ fontSize: 11, fontWeight: 700, color: "#166534", marginBottom: 4 }}>Rank: {m.sort_order}</div>}
                 <div style={{ fontSize: 11, fontWeight: 600, color: BOARD_TYPE_COLOR[m.board_type] || "#555", marginBottom: 6 }}>{BOARD_TYPE_LABEL[m.board_type] || m.board_type}</div>
                 <div className="board-bio">{m.bio}</div>
                 <div className="card-actions"><button className="edit-btn" onClick={() => setEditing(m)}><EditIcon /> Edit</button><button className="delete-btn" onClick={() => setDeleting(m)}><TrashIcon /> Delete</button></div>
@@ -920,10 +927,6 @@ function ManageBoard({ user, onBack, onLogout }) {
     </div>
   );
 }
-
-// ══════════════════════════════════════════════════════════════════════════
-//  MANAGE CAREERS
-// ══════════════════════════════════════════════════════════════════════════
 
 // ── Exam Result form modal (add / edit a single entry) ───────────────────
 function ExamResultFormModal({ initial, onClose, onSave }) {
@@ -1172,6 +1175,9 @@ function ExamResultsModal({ onClose, user }) {
   );
 }
 
+// ══════════════════════════════════════════════════════════════════════════
+//  MANAGE CAREERS
+// ══════════════════════════════════════════════════════════════════════════
 function JobModal({ initial, onClose, onSave }) {
   const isEdit = !!initial;
   const [form, setForm] = useState(initial
@@ -1322,7 +1328,7 @@ function ManageCareers({ user, onBack, onLogout }) {
       {showAdd  && <JobModal onClose={() => setShowAdd(false)} onSave={handleCreate} />}
       {editing  && <JobModal initial={editing} onClose={() => setEditing(null)} onSave={handleUpdate} />}
       {deleting && <ConfirmModal name={deleting.title} onClose={() => setDeleting(null)} onConfirm={handleDelete} />}
-      {showExamResults && <ExamResultsModal user={user} onClose={() => setShowExamResults(false)} />}
+      {showExamResults && <ExamResultsModal user={user} onClose={() => setShowExamResults(false)} />}  
       {Toast}
     </div>
   );
@@ -1807,7 +1813,8 @@ function ManageGuides({ user, onClose, onLogout }) {
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {guides.map(g => (
-              <div key={g.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", background: "#fafafa", border: "1.5px solid #e4ede4", borderRadius: 10 }}>
+              <div key={g.id} style={{ position:"relative", display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", background: "#fafafa", border: "1.5px solid #e4ede4", borderRadius: 10 }}>
+                {g.sort_order > 0 && <div style={{ fontSize: 11, fontWeight: 700, color: "#166534", marginBottom: 4, position: "absolute", top: 6, left: 6 }}>Rank: {g.sort_order}</div>}
                 <div style={{ width: 80, height: 52, borderRadius: 8, overflow: "hidden", background: "#e4ede4", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#8aaa8a" }}>
                   {g.thumbnail ? <img src={g.thumbnail} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e=>{e.target.style.display="none";e.target.nextSibling.style.display="flex"}} /> : null}
                   <span style={{display: g.thumbnail?"none":"flex"}}><VideoIcon size={18} /></span>
@@ -1846,6 +1853,7 @@ const SETT_TABS = [
   { id: "site",     label: "Site Info" },
   { id: "socials",  label: "Social Links" },
   { id: "banners",  label: "Hero Banners" },
+  { id: "featured", label: "Featured Products" },
   { id: "toggles",  label: "Feature Toggles" },
   { id: "users",    label: "Users" },
 ];
@@ -1884,6 +1892,29 @@ function ManageSettings({ user, onClose, onLogout }) {
   const [showBanAdd, setShowBanAdd] = useState(false); const [editingBan, setEditingBan] = useState(null); const [deletingBan, setDeletingBan] = useState(null);
   const fetchBanners = () => { setBanLoading(true); fetch(`${API_BASE}/settings/banners`).then(r=>r.json()).then(res=>{if(res.success)setBanners(res.data||[]);else fire("Failed","#c0392b")}).catch(()=>fire("Failed","#c0392b")).finally(()=>setBanLoading(false)) };
 
+  /* ── Featured Products ── */
+  const [allProducts, setAllProducts] = useState([]); const [fpLoading, setFpLoading] = useState(true);
+  const fetchAllProducts = () => { setFpLoading(true); fetch(`${API_BASE}/products?is_active=true&limit=100`).then(r=>r.json()).then(res=>{if(res.success)setAllProducts(res.data||[]);else fire("Failed","#c0392b")}).catch(()=>fire("Failed","#c0392b")).finally(()=>setFpLoading(false)) };
+  const toggleFeatured = async (p) => {
+    try {
+      const r = await fetch(`${API_BASE}/products/${p.id}`, { method: "PUT", headers: apiHeaders(), body: JSON.stringify({ is_featured: !p.is_featured }) });
+      const j = await r.json();
+      if (!r.ok || !j.success) throw new Error(j.message || "Failed");
+      setAllProducts(prev => prev.map(x => x.id === p.id ? { ...x, is_featured: !x.is_featured } : x));
+      fire(j.data?.is_featured ? "✓ Marked as featured" : "Removed from featured");
+    } catch (e) { fire(e.message, "#c0392b"); }
+  };
+  const [editingFp, setEditingFp] = useState(null);
+  const updateFeaturedLabel = async (p, label) => {
+    try {
+      const r = await fetch(`${API_BASE}/products/${p.id}`, { method: "PUT", headers: apiHeaders(), body: JSON.stringify({ featured_label: label }) });
+      const j = await r.json();
+      if (!r.ok || !j.success) throw new Error(j.message || "Failed");
+      setAllProducts(prev => prev.map(x => x.id === p.id ? { ...x, featured_label: label } : x));
+      fire("✓ Label updated");
+    } catch (e) { fire(e.message, "#c0392b"); }
+  };
+
   /* ── Toggles ── */
   const [toggles, setToggles] = useState([]); const [togLoading, setTogLoading] = useState(true);
   const [showTogAdd, setShowTogAdd] = useState(false); const [editingTog, setEditingTog] = useState(null); const [deletingTog, setDeletingTog] = useState(null);
@@ -1896,6 +1927,7 @@ function ManageSettings({ user, onClose, onLogout }) {
 
   useEffect(() => {
     if (tab==="socials") fetchSocials(); else if (tab==="banners") fetchBanners();
+    else if (tab==="featured") fetchAllProducts();
     else if (tab==="toggles") fetchToggles(); else if (tab==="users") fetchUsers();
   }, [tab]);
 
@@ -1947,6 +1979,31 @@ function ManageSettings({ user, onClose, onLogout }) {
           </div>)}</div>}
         </>}
 
+        {/* Featured Products */}
+        {tab === "featured" && <>
+          {fpLoading ? <p style={{textAlign:"center",padding:28,color:"#8aaa8a"}}>Loading...</p> : !allProducts.length ? <p style={{textAlign:"center",padding:28,color:"#8aaa8a"}}>No products yet. Create products first.</p> :
+          <div style={{display:"flex",flexDirection:"column",gap:10,maxHeight:"55vh",overflowY:"auto",paddingRight:4}}>
+            {allProducts.map(p => {
+              const isFav = p.is_featured;
+              return (
+                <div key={p.id} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 16px",background:isFav?"#f0f7f2":"#fafafa",border:`1.5px solid ${isFav?"#1a5c2a":"#e4ede4"}`,borderRadius:10,transition:"all .2s"}}>
+                  <div style={{width:36,height:36,borderRadius:8,background:isFav?"#1a5c2a":"#e4ede4",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke={isFav?"white":"#8aaa8a"} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" width="18" height="18"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" /></svg>
+                  </div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:13.5,color:"#0d1f0d"}}><strong>{p.title}</strong><span style={{color:"#c8dcc8",margin:"0 8px"}}>|</span>{p.type==="loan"?"Loan":"Savings"}<span style={{marginLeft:8,fontSize:11,opacity:.6}}>{p.interest_rate}%</span></div>
+                    {isFav && p.featured_label && <div style={{fontSize:11,color:"#1a5c2a",marginTop:2}}>Label: {p.featured_label}</div>}
+                  </div>
+                  <button onClick={()=>toggleFeatured(p)} style={{background:isFav?"#1a5c2a":"white",color:isFav?"white":"#1a5c2a",border:`1.5px solid ${isFav?"#1a5c2a":"#e4ede4"}`,borderRadius:6,padding:"6px 14px",fontSize:12,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}}>
+                    {isFav ? "★ Featured" : "Feature"}
+                  </button>
+                  {isFav && <button onClick={()=>setEditingFp(p)} style={{background:"white",color:"#1a5c2a",border:"1.5px solid #e4ede4",borderRadius:6,padding:"6px 12px",fontSize:12,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap"}}><EditIcon/> Label</button>}
+                </div>
+              );
+            })}
+          </div>}
+        </>}
+
         {/* Toggles */}
         {tab === "toggles" && <>
           <div style={{display:"flex",justifyContent:"flex-end",marginBottom:14}}><button className="add-btn" onClick={()=>setShowTogAdd(true)}><PlusIcon /> Add Toggle</button></div>
@@ -1983,6 +2040,9 @@ function ManageSettings({ user, onClose, onLogout }) {
       {showBanAdd && <SettForm fields={["title","subtitle","image_url","cta_label","cta_link","page","sort_order"]} onClose={()=>setShowBanAdd(false)} onSave={async d=>{try{const r=await fetch(`${API_BASE}/settings/banners`,{method:"POST",headers:apiHeaders(),body:JSON.stringify(d)});const j=await r.json();if(!r.ok||!j.success)throw new Error(j.message||"Failed");setShowBanAdd(false);fetchBanners();fire("✓ Created!")}catch(e){fire(e.message,"#c0392b")}}} />}
       {editingBan && <SettForm initial={editingBan} fields={["title","subtitle","image_url","cta_label","cta_link","page","sort_order","is_active"]} onClose={()=>setEditingBan(null)} onSave={async d=>{try{const r=await fetch(`${API_BASE}/settings/banners/${editingBan.id}`,{method:"PUT",headers:apiHeaders(),body:JSON.stringify(d)});const j=await r.json();if(!r.ok||!j.success)throw new Error(j.message||"Failed");setEditingBan(null);fetchBanners();fire("✓ Updated!")}catch(e){fire(e.message,"#c0392b")}}} />}
       {deletingBan && <ConfirmModal name={deletingBan.title} onClose={()=>setDeletingBan(null)} onConfirm={async()=>{try{const r=await fetch(`${API_BASE}/settings/banners/${deletingBan.id}`,{method:"DELETE",headers:apiHeaders()});const j=await r.json();if(!r.ok||!j.success)throw new Error(j.message||"Failed");setDeletingBan(null);fetchBanners();fire("Deleted.","#c0392b")}catch(e){fire(e.message,"#c0392b")}}} />}
+
+      {/* Featured Label Editor */}
+      {editingFp && <FeaturedLabelEditor product={editingFp} onClose={()=>setEditingFp(null)} onSave={label=>{updateFeaturedLabel(editingFp,label);setEditingFp(null);}} />}
 
       {/* Toggle Form */}
       {showTogAdd && <SettForm fields={["key","label","description"]} booleans={["is_enabled"]} onClose={()=>setShowTogAdd(false)} onSave={async d=>{try{const r=await fetch(`${API_BASE}/settings/toggles`,{method:"POST",headers:apiHeaders(),body:JSON.stringify(d)});const j=await r.json();if(!r.ok||!j.success)throw new Error(j.message||"Failed");setShowTogAdd(false);fetchToggles();fire("✓ Created!")}catch(e){fire(e.message,"#c0392b")}}} />}
@@ -2043,6 +2103,24 @@ function SettForm({ initial, fields, booleans = [], onClose, onSave }) {
   );
 }
 
+function FeaturedLabelEditor({ product, onClose, onSave }) {
+  const [label, setLabel] = useState(product.featured_label || "");
+  const [saving, setSaving] = useState(false);
+  const handleSave = async () => { setSaving(true); try { await onSave(label); } finally { setSaving(false); } };
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal">
+        <div className="modal-header">
+          <div><div className="modal-title">Edit Featured Label</div><div className="modal-sub">{product.title}</div></div>
+          <button className="modal-close" onClick={onClose}><CloseIcon /></button>
+        </div>
+        <div className="form-group"><label className="form-label">Label (shown on homepage)</label><input className="form-input" placeholder="e.g. Up to 15 years, Quick approval" value={label} onChange={e => setLabel(e.target.value)} /></div>
+        <div className="modal-footer"><button className="cancel-btn" onClick={onClose}>Cancel</button><button className="submit-btn" onClick={handleSave} disabled={saving}>{saving ? "Saving..." : "Save Label"}</button></div>
+      </div>
+    </div>
+  );
+}
+
 // ══════════════════════════════════════════════════════════════════════════
 //  DASHBOARD
 // ══════════════════════════════════════════════════════════════════════════
@@ -2055,6 +2133,7 @@ const DASH_MODULES = [
   { id: "trends",   icon: <TrendIcon />,     title: "Trends & Stats", desc: "Update financial indicators",       btn: "Manage Trends",   page: null       },
   { id: "videos",   icon: <VideoIcon />,     title: "Video Guides",   desc: "Manage tutorial videos for users",  btn: "Manage Guides",   page: null       },
   { id: "settings", icon: <SettingsIcon />,  title: "Settings",       desc: "Configure website settings",        btn: "Manage Settings", page: null       },
+  { id: "digital",  icon: <GlobeIcon />,    title: "Digital Services", desc: "Manage digital banking services",  btn: "Manage Digital", page: "digital"       },
   { id: "forms",    icon: <FileIcon />,       title: "Forms",          desc: "Manage downloadable forms for members", btn: "Manage Forms", page: null       },
 ];
 
@@ -2289,6 +2368,181 @@ function FormModal({ initial, onClose, onSave }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
+//  MANAGE DIGITAL SERVICES
+// ══════════════════════════════════════════════════════════════════════════
+function DigitalServiceFormModal({ initial, onClose, onSave }) {
+  const isEdit = !!initial;
+  const [form, setForm] = useState(initial ? { ...initial } : {
+    title: "", description: "", icon_bg: "#e8f0eb", icon_color: "#2d6a4f",
+    features: [], cta_label: "", cta_link: "", image_url: "", sort_order: 0
+  });
+  const [featureInput, setFeatureInput] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const addFeature = () => { if (featureInput.trim()) { set("features", [...(form.features || []), featureInput.trim()]); setFeatureInput(""); } };
+  const removeFeature = idx => set("features", form.features.filter((_, i) => i !== idx));
+  const handleSave = () => { if (!form.title.trim()) return; onSave({ ...form }); };
+  const handleImageUpload = async e => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const r = await fetch(`${API_BASE}/upload`, { method: "POST", headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` }, body: fd });
+      const j = await r.json();
+      if (j.success) set("image_url", j.data?.url || j.url || "");
+    } catch {}
+    setUploading(false);
+  };
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal">
+        <div className="modal-header">
+          <div><div className="modal-title">{isEdit ? "Edit Digital Service" : "Add Digital Service"}</div><div className="modal-sub">Manage digital banking service</div></div>
+          <button className="modal-close" onClick={onClose}><CloseIcon /></button>
+        </div>
+        <div className="form-group"><label className="form-label">Title *</label><input className="form-input" placeholder="e.g., Mobile Banking App" value={form.title} onChange={e => set("title", e.target.value)} /></div>
+        <div className="form-group"><label className="form-label">Description</label><textarea className="form-textarea" placeholder="Brief description of the service" value={form.description || ""} onChange={e => set("description", e.target.value)} /></div>
+        <div className="form-row">
+          <div className="form-group"><label className="form-label">CTA Label</label><input className="form-input" placeholder="e.g., Download App" value={form.cta_label || ""} onChange={e => set("cta_label", e.target.value)} /></div>
+          <div className="form-group"><label className="form-label">CTA Link</label><input className="form-input" placeholder="https://..." value={form.cta_link || ""} onChange={e => set("cta_link", e.target.value)} /></div>
+        </div>
+        <div className="form-group">
+          <label className="form-label">Image</label>
+          {form.image_url && <img src={form.image_url.startsWith("/") ? API_ORIGIN + form.image_url : form.image_url} alt="" style={{ width: 80, height: 80, borderRadius: 10, objectFit: "cover", marginBottom: 8 }} />}
+          <input type="file" accept="image/*" onChange={handleImageUpload} style={{ fontSize: 13 }} />
+          {uploading && <p style={{ fontSize: 12, color: "#166534", marginTop: 4 }}>Uploading...</p>}
+          <input className="form-input" placeholder="Or paste image URL" value={form.image_url || ""} onChange={e => set("image_url", e.target.value)} style={{ marginTop: 6 }} />
+        </div>
+        <div className="form-group">
+          <label className="form-label">Features</label>
+          <div style={{ display: "flex", gap: 6 }}>
+            <input className="form-input" placeholder="Add a feature" value={featureInput} onChange={e => setFeatureInput(e.target.value)} onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addFeature())} />
+            <button type="button" className="add-btn" onClick={addFeature} style={{ whiteSpace: "nowrap" }}><PlusIcon /> Add</button>
+          </div>
+          {(form.features || []).length > 0 && (
+            <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
+              {form.features.map((f, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}>
+                  <span style={{ flex: 1 }}>• {f}</span>
+                  <button type="button" onClick={() => removeFeature(i)} style={{ background: "none", border: "none", color: "#c0392b", cursor: "pointer", fontSize: 12 }}>✕</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="form-group"><label className="form-label">Sort Order</label><input className="form-input" type="number" placeholder="0" value={form.sort_order} onChange={e => set("sort_order", parseInt(e.target.value) || 0)} /></div>
+        <div className="modal-footer">
+          <button className="cancel-btn" onClick={onClose} type="button">Cancel</button>
+          <button className="submit-btn" onClick={handleSave} type="button">{isEdit ? "Save Changes" : "Create Service"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ManageDigitalServices({ user, onBack, onLogout }) {
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAdd, setShowAdd] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [deleting, setDeleting] = useState(null);
+  const [fire, Toast] = useToast();
+
+  const fetchServices = () => {
+    setLoading(true);
+    fetch(`${API_BASE}/digital-services/admin/all`, { headers: apiHeaders() })
+      .then(r => r.json())
+      .then(res => { if (res.success) setServices(res.data || []); else fire("Failed to load services", "#c0392b"); })
+      .catch(() => fire("Failed to load services", "#c0392b"))
+      .finally(() => setLoading(false));
+  };
+  useEffect(() => { fetchServices(); }, []);
+
+  const handleCreate = async data => {
+    try {
+      const r = await fetch(`${API_BASE}/digital-services`, { method: "POST", headers: apiHeaders(), body: JSON.stringify(data) });
+      const j = await r.json();
+      if (!r.ok || !j.success) throw new Error(j.message || "Failed");
+      setShowAdd(false); fetchServices(); fire("✓ Service created!");
+    } catch (e) { fire(e.message, "#c0392b"); }
+  };
+  const handleUpdate = async data => {
+    try {
+      const r = await fetch(`${API_BASE}/digital-services/${editing.id}`, { method: "PUT", headers: apiHeaders(), body: JSON.stringify(data) });
+      const j = await r.json();
+      if (!r.ok || !j.success) throw new Error(j.message || "Failed");
+      setEditing(null); fetchServices(); fire("✓ Service updated!");
+    } catch (e) { fire(e.message, "#c0392b"); }
+  };
+  const handleDelete = async () => {
+    try {
+      const r = await fetch(`${API_BASE}/digital-services/${deleting.id}`, { method: "DELETE", headers: apiHeaders() });
+      const j = await r.json();
+      if (!r.ok || !j.success) throw new Error(j.message || "Failed");
+      setDeleting(null); fetchServices(); fire("Service deleted.", "#c0392b");
+    } catch (e) { fire(e.message, "#c0392b"); }
+  };
+  const toggleActive = async svc => {
+    try {
+      const r = await fetch(`${API_BASE}/digital-services/${svc.id}`, { method: "PUT", headers: apiHeaders(), body: JSON.stringify({ is_active: !svc.is_active }) });
+      const j = await r.json();
+      if (r.ok && j.success) fetchServices();
+    } catch (e) { fire(e.message, "#c0392b"); }
+  };
+
+  return (
+    <div className="mgmt-root">
+      <TopNav user={user} onLogout={onLogout} />
+      <SubHeader title="Digital Services" onBack={onBack} />
+      <div className="mgmt-main">
+        <div className="mgmt-header">
+          <div><h1 className="mgmt-page-title">Digital Services</h1><p className="page-sub">Manage digital banking service cards displayed on the /digital page</p></div>
+          <button className="add-btn" onClick={() => setShowAdd(true)}><PlusIcon /> Add Service</button>
+        </div>
+        {loading ? (
+          <p style={{ textAlign: "center", padding: 40, color: "#8aaa8a" }}>Loading services...</p>
+        ) : !services.length ? (
+          <p style={{ textAlign: "center", padding: 40, color: "#8aaa8a" }}>No services yet. Add your first digital service.</p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {services.map(s => (
+              <div key={s.id} style={{ position: "relative", display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", background: "#fafafa", border: "1.5px solid #e4ede4", borderRadius: 10 }}>
+                {s.sort_order > 0 && <div style={{ fontSize: 11, fontWeight: 700, color: "#166534" }}>#{s.sort_order}</div>}
+                <div style={{ width: 56, height: 56, borderRadius: 10, background: s.icon_bg || "#e8f0eb", flexShrink: 0, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {s.image_url ? <img src={s.image_url.startsWith("/") ? API_ORIGIN + s.image_url : s.image_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { e.target.style.display = "none"; e.target.nextSibling.style.display = "flex"; }} /> : null}
+                  <span style={{ display: s.image_url ? "none" : "flex" }}><GlobeIcon size={22} /></span>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3, flexWrap: "wrap" }}>
+                    <strong style={{ fontSize: 14, color: "#0d1f0d" }}>{s.title}</strong>
+                    {!s.is_active && <span style={{ fontSize: 10, padding: "2px 6px", background: "#fee", color: "#c0392b", borderRadius: 4 }}>Inactive</span>}
+                  </div>
+                  <div style={{ fontSize: 12.5, color: "#8aaa8a", maxWidth: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {s.description || "No description"}
+                    {s.features && s.features.length > 0 && <span> · {s.features.length} features</span>}
+                  </div>
+                </div>
+                <div className="card-actions">
+                  <button className="edit-btn" onClick={() => toggleActive(s)} style={{ fontSize: 11 }}>{s.is_active ? "Hide" : "Show"}</button>
+                  <button className="edit-btn" onClick={() => setEditing(s)}><EditIcon /> Edit</button>
+                  <button className="delete-btn" onClick={() => setDeleting(s)}><TrashIcon /> Delete</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      {showAdd && <DigitalServiceFormModal onClose={() => setShowAdd(false)} onSave={handleCreate} />}
+      {editing && <DigitalServiceFormModal initial={editing} onClose={() => setEditing(null)} onSave={handleUpdate} />}
+      {deleting && <ConfirmModal name={deleting.title} onClose={() => setDeleting(null)} onConfirm={handleDelete} />}
+      {Toast}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
 //  ROOT
 // ══════════════════════════════════════════════════════════════════════════
 export default function AdminPanel() {
@@ -2299,7 +2553,8 @@ export default function AdminPanel() {
   const [showGuides, setShowGuides] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showForms, setShowForms] = useState(false);
-  const handleLogout = () => { setUser(null); setPage("dashboard"); setShowNews(false); setShowTrends(false); setShowGuides(false); setShowSettings(false); setShowForms(false); };
+  const [showDigital, setShowDigital] = useState(false);
+  const handleLogout = () => { setUser(null); setPage("dashboard"); setShowNews(false); setShowTrends(false); setShowGuides(false); setShowSettings(false); setShowForms(false); setShowDigital(false); };
   const back = () => setPage("dashboard");
   const handleModalOpen = id => {
     if (id === "news") setShowNews(true);
@@ -2318,6 +2573,7 @@ export default function AdminPanel() {
       {user && page==="services"  && <ManageServices user={user} onBack={back} onLogout={handleLogout} />}
       {user && page==="board"     && <ManageBoard    user={user} onBack={back} onLogout={handleLogout} />}
       {user && page==="careers"   && <ManageCareers  user={user} onBack={back} onLogout={handleLogout} />}
+      {user && page==="digital"   && <ManageDigitalServices user={user} onBack={back} onLogout={handleLogout} />}
       {showNews    && <ManageNews    user={user} onClose={() => setShowNews(false)}    onLogout={handleLogout} />}
       {showTrends  && <ManageTrends  user={user} onClose={() => setShowTrends(false)}  onLogout={handleLogout} />}
       {showGuides  && <ManageGuides  user={user} onClose={() => setShowGuides(false)}  onLogout={handleLogout} />}
