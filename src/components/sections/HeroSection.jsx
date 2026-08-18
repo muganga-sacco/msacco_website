@@ -75,7 +75,7 @@ export default function HeroSection() {
                 flexShrink: 0,
                 display: "inline-block",
               }} />
-              Trusted by 10,000+ health professionals
+              Trusted by 10,000+ members
             </div>
 
             <h1 style={{ paddingTop: 50, fontSize: "clamp(2rem, 4.5vw, 3.2rem)", color: "#000", fontWeight: 800, lineHeight: 1.18, marginBottom: 20, letterSpacing: "-0.02em" }}>
@@ -84,7 +84,7 @@ export default function HeroSection() {
             </h1>
 
             <p style={{ fontSize: "1rem", lineHeight: 1.8, color: "#000", marginBottom: 36, maxWidth: 480 }}>
-              Access affordable loans, competitive savings accounts, and digital financial services designed specifically for healthcare professionals in Rwanda.
+              Access affordable loans, competitive savings accounts, and digital financial services designed specifically for Rwanda's healthcare community.
             </p>
 
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 48 }}>
@@ -202,7 +202,7 @@ export default function HeroSection() {
               <div style={{ background: "#fff", borderRadius: 6, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, border: "1px solid #e5e7eb" }}>
                 <div style={{ width: 38, height: 38, background: "#246d36", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "1rem", flexShrink: 0 }}><Stethoscope color="#fff"/> </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: "0.82rem", fontWeight: 600, color: "#111" }}>Healthcare Professional</div>
+                  <div style={{ fontSize: "0.82rem", fontWeight: 600, color: "#111" }}>Muganga SACCO Member</div>
                   <div style={{ fontSize: "0.7rem", color: "#246d36" }}>Account verified ✓</div>
                 </div>
                 <div style={{ textAlign: "right" }}>

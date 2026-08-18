@@ -143,7 +143,7 @@ function Modal({ product, type, onClose }) {
         {/* Header */}
         <div style={{ marginBottom: 20 }}>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.45rem", fontWeight: 700, color: "#1a1a14", margin: 0 }}>{product.title}</h2>
-          <p style={{ fontSize: "0.95rem", color: "#7a7a6a", margin: "3px 0 0", fontWeight: 300 }}>{product.description}</p>
+          {product.description ? <p style={{ fontSize: "0.95rem", color: "#7a7a6a", margin: "3px 0 0", fontWeight: 300 }}>{product.description}</p> : null}
         </div>
 
         {/* Rate + Limit */}
@@ -155,18 +155,36 @@ function Modal({ product, type, onClose }) {
             <div style={{ fontSize: "0.8rem", color: "#7a7a6a" }}>{product.rateLabel || "per annum"}</div>
           </div>
           ) : null}
+          {product.limit ? (
           <div style={{ flex: 1, background: "#f5f5f0", borderRadius: 10, padding: "12px 16px" }}>
             <div style={{ fontSize: "0.8rem", color: "#7a7a6a", marginBottom: 2, textTransform: "uppercase", letterSpacing: "0.05em" }}>Limit</div>
             <div style={{ fontSize: "1.15rem", fontWeight: 600, color: "#1a1a14", lineHeight: 1.3, marginTop: 4 }}>{product.limit}</div>
           </div>
+          ) : null}
         </div>
 
         {/* Overview */}
+        {product.details.overview && (
         <Section title="Overview" accent={accent}>
           <p style={{ fontSize: "0.95rem", color: "#4a4a3a", lineHeight: 1.7, margin: 0, fontWeight: 300 }}>{product.details.overview}</p>
         </Section>
+        )}
+
+        {/* Features */}
+        {product.features?.length > 0 && (
+          <Section title="Features" accent={accent}>
+            <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
+              {product.features.map((item, i) => (
+                <li key={i} style={{ display: "flex", gap: 8, fontSize: "0.92rem", color: "#4a4a3a", padding: "3px 0", fontWeight: 300 }}>
+                  <span style={{ color: accent, flexShrink: 0 }}>✓</span>{item}
+                </li>
+              ))}
+            </ul>
+          </Section>
+        )}
 
         {/* Eligibility */}
+        {product.details.eligibility?.length > 0 && (
         <Section title="Eligibility" accent={accent}>
           <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
             {product.details.eligibility.map((item, i) => (
@@ -176,8 +194,10 @@ function Modal({ product, type, onClose }) {
             ))}
           </ul>
         </Section>
+        )}
 
         {/* Documents */}
+        {product.details.documents?.length > 0 && (
         <Section title="Required Documents" accent={accent}>
           <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
             {product.details.documents.map((doc, i) => (
@@ -187,11 +207,14 @@ function Modal({ product, type, onClose }) {
             ))}
           </ul>
         </Section>
+        )}
 
         {/* Process */}
+        {product.details.process && (
         <Section title="Application Process" accent={accent}>
           <p style={{ fontSize: "0.95rem", color: "#4a4a3a", lineHeight: 1.7, margin: 0, fontWeight: 300 }}>{product.details.process}</p>
         </Section>
+        )}
 
         {/* Targeted Customers */}
         {product.details.targeted_customers?.length > 0 && (
@@ -283,6 +306,7 @@ export default function Products() {
   const toFrontend = (api) => {
     const d = DETAILS_BY_TITLE[api.title] || {};
     const amount = api.max_amount ? `Up to RWF ${Number(api.max_amount).toLocaleString()}` : "";
+    const rateLabelFromPeriod = api.interest_period === "monthly" ? "per month" : "per annum";
     return {
       id: api.id,
       imageUrl: api.image_url || "",
@@ -291,17 +315,17 @@ export default function Products() {
       rate: api.interest_rate ? parseFloat(api.interest_rate) : "",
       rateDisplay: api.type === "savings" && !api.interest_rate ? "Free" : undefined,
       rateTitle: api.type === "savings" && !api.interest_rate ? "Opening Fee" : undefined,
-      rateLabel: api.type === "savings" && !api.interest_rate ? "Opening Fee" : undefined,
+      rateLabel: api.type === "savings" && !api.interest_rate ? "Opening Fee" : rateLabelFromPeriod,
       limit: amount || (api.type === "savings" ? "Contact us for details" : ""),
       features: api.features || [],
       featured: api.is_featured || false,
       featuredLabel: api.featured_label || (api.is_featured ? "Featured" : null),
-      cta: api.cta_label || (api.type === "loan" ? "More Details" : api.type === "savings" ? "Open Account" : "More Details"),
+      cta: "More Details",
       details: {
         overview: d.overview || api.description || "",
         eligibility: api.eligibility || d.eligibility || [],
         documents: api.required_documents || d.documents || [],
-        process: api.application_process || d.process || "Contact us for more information.",
+        process: api.application_process || d.process || "",
         targeted_customers: api.targeted_customers || [],
         benefits: api.benefits || [],
         required_forms: api.required_forms || [],
@@ -347,19 +371,12 @@ export default function Products() {
                 {p.featuredLabel && <div className={`featured-badge ${type}`}>{p.featuredLabel}</div>}
                 {p.imageUrl ? <img src={p.imageUrl.startsWith("/") ? API_ORIGIN + p.imageUrl : p.imageUrl} alt={p.title} style={{ width:"100%", height:180, objectFit:"cover", display:"block", borderRadius:12, marginTop: p.featuredLabel ? 36 : 0 }} /> : null}
                 <div className="card-title">{p.title}</div>
-                <div className="card-desc">{p.description}</div>
                 {p.rateDisplay || p.rate > 0 ? (
                 <div className="rate-row">
                   <span className={`rate-num ${type}`}>{p.rateDisplay || `${p.rate}%`}</span>
                   <span className="rate-label">{p.rateLabel || "Annual Interest"}</span>
                 </div>
                 ) : null}
-                <div className="card-limit">{p.limit}</div>
-                <ul className="features-list">
-                  {p.features.map((f, i) => (
-                    <li key={i}><span className={`check ${type}`}>✓</span>{f}</li>
-                  ))}
-                </ul>
                 <button className={`cta-btn ${type}`} onClick={() => setSelectedProduct(p)}>{p.cta}</button>
               </div>
             );

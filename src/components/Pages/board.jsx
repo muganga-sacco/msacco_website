@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
-// const API_ORIGIN = API_BASE.replace(/\/api\/?$/, "");
-
-// function resolveImageUrl(url) {
-//   if (!url) return "";
-//   if (url.startsWith("/")) return API_ORIGIN + url;
-//   return url;
-// }
 
 const PRINCIPLE_COLORS = [
   { color: "#2d6a4f", bg: "#e8f0eb" },
@@ -128,7 +121,7 @@ export default function board() {
       <div className="lg-hero">
         <h1>Leadership & Governance</h1>
         <p>
-          Meet the dedicated team of healthcare professionals leading Muganga SACCO
+          Meet the dedicated team leading Muganga SACCO
           towards sustainable growth and member prosperity.
         </p>
       </div>
@@ -141,7 +134,7 @@ export default function board() {
           <div className="lg-section">
             <div className="section-header">
               <h2>Board of Directors</h2>
-              <p>Our board comprises experienced healthcare professionals committed to transparent governance and member value.</p>
+              <p>Our board comprises experienced leaders committed to transparent governance and member value.</p>
             </div>
             <div className="board-grid">
               {boardMembers.length === 0 ? (
@@ -175,7 +168,7 @@ export default function board() {
           <div className="lg-section">
             <div className="section-header">
               <h2>Management Team</h2>
-              <p>Our executive team brings decades of combined experience in financial services and healthcare administration.</p>
+              <p>Our executive team brings decades of combined experience in financial services and organizational leadership.</p>
             </div>
             <div className="mgmt-grid">
               {managementTeam.length === 0 ? (

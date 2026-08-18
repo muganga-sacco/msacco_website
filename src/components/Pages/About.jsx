@@ -1,3 +1,5 @@
+import coreValuesImg from "../../Images/Core_Values.png";
+
 const profileStats = [
   { value: "Health", label: "Sector focus" },
   { value: "Public & Private", label: "Member coverage" },
@@ -10,25 +12,6 @@ const audiences = [
   "Private health professionals",
   "Public & Private health facilitiess",
   "Community Health Workers",
-];
-
-const values = [
-  {
-    title: "Financial Inclusion",
-    desc: "Affordable financial solutions for the full healthcare ecosystem.",
-  },
-  {
-    title: "Member Care",
-    desc: "Services designed around members' needs, delivered with professionalism.",
-  },
-  {
-    title: "Innovation",
-    desc: "Modern financial and personal development solutions for health workers.",
-  },
-  {
-    title: "Retention",
-    desc: "Supporting healthcare professionals so they can thrive and continue serving.",
-  },
 ];
 
 export default function About() {
@@ -44,7 +27,7 @@ export default function About() {
             <p>
               Muganga SACCO is a Savings and Credit Cooperative serving health sector staff in Rwanda.
               It exists to improve members' socio-economic conditions, promote savings, and expand access
-              to low-rate loans that support healthcare professionals and their institutions.
+              to low-rate loans that support our members and their institutions.
             </p>
             <div className="hero-actions">
               <a className="profile-btn primary" href="/products">Explore Products</a>
@@ -60,7 +43,7 @@ export default function About() {
             </div>
             <div className="hero-note">
               <strong>Member first</strong>
-              <span>Supporting healthcare professionals with accessible, professional, and inclusive financial services.</span>
+              <span>Supporting our members with accessible, professional, and inclusive financial services.</span>
             </div>
           </div>
         </div>
@@ -81,7 +64,7 @@ export default function About() {
         <div className="history-grid">
           <div className="history-panel">
             <span className="eyebrow">Our History</span>
-            <h3>Created to motivate, retain, and empower healthcare professionals.</h3>
+            <h3>Created to motivate, retain, and empower our members.</h3>
             <p>
               The SACCO was established after the Government of Rwanda advised the Ministry of Health to
               find practical strategies that improve motivation and retention in the healthcare workforce.
@@ -96,8 +79,8 @@ export default function About() {
             </div>
             <div className="story-card">
               <p>
-                Its mandate extends beyond public health professionals. The cooperative also serves private
-                healthcare professionals and facilities, as well as Community Health Workers, widening access
+                Its mandate extends beyond public health sector staff. The cooperative also serves private
+                health sector staff and facilities, as well as Community Health Workers, widening access
                 to financial services across Rwanda's healthcare industry.
               </p>
             </div>
@@ -152,21 +135,8 @@ export default function About() {
         </div>
       </section>
 
-      <section className="profile-section">
-        <div className="section-head">
-          <span className="eyebrow">Core Values</span>
-          <h2>Principles behind the service</h2>
-          <p>These values translate the cooperative's mandate into daily decisions and member experiences.</p>
-        </div>
-        <div className="values-grid">
-          {values.map((value, index) => (
-            <div className="value-card" key={value.title}>
-              <div className="value-number">{index + 1}</div>
-              <h3>{value.title}</h3>
-              <p>{value.desc}</p>
-            </div>
-          ))}
-        </div>
+      <section className="profile-section" style={{ textAlign: "center" }}>
+        <img src={coreValuesImg} alt="Core Values" style={{ maxWidth: "100%", height: "auto", borderRadius: 12 }} />
       </section>
 
       <section className="profile-section">

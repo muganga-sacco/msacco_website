@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Home, Briefcase, PlusCircle, Globe, Smartphone, CreditCard,
   ArrowRight, CheckCircle2, TrendingUp,
   Users, Shield, Clock, Percent, Phone, Download, MonitorSmartphone,
-  Play,
+  Play, Heart, Car, GraduationCap, Landmark, PiggyBank, Wallet,
 } from "lucide-react";
+import lnrsCircle from "../../Images/LNRS Provider-Circle.jpg";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 
@@ -22,11 +23,16 @@ const QUICK = [
 ];
 
 // ── Loan products ─────────────────────────────────────────────
-const LOANS = [
-  { icon: <Home      size={28} strokeWidth={1.5} color="white" />, label: "Housing Loan",   sub: "Up to 15 years", rate: "10%" },
-  { icon: <Briefcase size={28} strokeWidth={1.5} color="white" />, label: "Business Loan",  sub: "Up to 15 years", rate: "14%" },
-  { icon: <PlusCircle size={28} strokeWidth={1.5} color="white" />, label: "Emergency Loan", sub: "Quick approval",  rate: "16%" },
-];
+const ICON_MAP = {
+  home: Home, briefcase: Briefcase, plus: PlusCircle, globe: Globe,
+  heart: Heart, car: Car, graduation: GraduationCap, land: Landmark,
+  piggy: PiggyBank, wallet: Wallet, phone: Smartphone, credit: CreditCard,
+  trend: TrendingUp, shield: Shield, clock: Clock, users: Users,
+};
+function getIcon(name, size = 28) {
+  const C = ICON_MAP[(name || "").toLowerCase()] || Home;
+  return <C size={size} strokeWidth={1.5} color="white" />;
+}
 
 // ── Savings options ───────────────────────────────────────────
 const SAVINGS = [
@@ -45,7 +51,7 @@ const DIGITAL = [
 
 // ── Why choose ────────────────────────────────────────────────
 const WHY = [
-  { icon: <Percent    size={30} strokeWidth={1.5} color={G} />, title: "Lowest Interest Rates",  sub: "Competitive and fair rates tailored for healthcare professionals." },
+  { icon: <Percent    size={30} strokeWidth={1.5} color={G} />, title: "Lowest Interest Rates",  sub: "Competitive and fair rates tailored for our members." },
   { icon: <TrendingUp size={30} strokeWidth={1.5} color={G} />, title: "Competitive Returns",    sub: "Earn attractive returns on savings with our flexible savings accounts." },
   { icon: <Globe      size={30} strokeWidth={1.5} color={G} />, title: "Digital Banking",        sub: "Access your account anytime, anywhere with our secure platforms." },
   { icon: <Users      size={30} strokeWidth={1.5} color={G} />, title: "Community Support",      sub: "Together we build financial wellbeing for Rwanda's healthcare community." },
@@ -57,37 +63,33 @@ const WHY = [
 
 // ── Video guides ──────────────────────────────────────────────
 
-// ─────────────────────────────────────────────────────────────
-
-function TwitterTimeline() {
-  const ref = useRef(null);
-  useEffect(() => {
-    if (!window.twttr) {
-      const s = document.createElement("script");
-      s.src = "https://platform.twitter.com/widgets.js";
-      s.async = true;
-      s.onload = () => window.twttr && window.twttr.widgets.load();
-      document.body.appendChild(s);
-    }
-  }, []);
-  return (
-    <div ref={ref}>
-      <a className="twitter-timeline" data-height="400" data-chrome="noheader nofooter noborders noscrollbar transparent" href="https://twitter.com/mugangasaccorw">Tweets by Muganga SACCO</a>
-    </div>
-  );
+function getYouTubeId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:v=|youtu\.be\/|\/embed\/|\/shorts\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
 }
+
+function getYouTubeThumb(url) {
+  const id = getYouTubeId(url);
+  return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null;
+}
+
+// ─────────────────────────────────────────────────────────────
 
 export default function HomePage(){
   const navigate = useNavigate();
   const [videos, setVideos] = useState([]);
+  const [featuredLoans, setFeaturedLoans] = useState([]);
+  const [reports, setReports] = useState([]);
+  const [newsList, setNewsList] = useState([]);
   const [hovered, setHovered] = useState(null);
   const [slideIdx, setSlideIdx] = useState(0);
 
   const SLIDES = [
-    { title: "Financial Freedom", text: "At Muganga SACCO, we believe in empowering healthcare professionals with accessible financial solutions. Our tailored loan products help you achieve your goals while maintaining financial stability." },
+    { title: "Financial Freedom", text: "At Muganga SACCO, we believe in empowering our members with accessible financial solutions. Our tailored loan products help you achieve your goals while maintaining financial stability." },
     { title: "Grow Your Savings", text: "Build a secure financial future with our competitive savings accounts. Enjoy flexible deposit options, attractive interest rates, and the peace of mind that comes with knowing your money is working for you." },
     { title: "Digital Banking", text: "Access your accounts anytime, anywhere through our secure digital platforms. From mobile banking to online transfers, manage your finances with just a few taps on your device." },
-    { title: "Community First", text: "Join a community of over 10,000 healthcare professionals who trust Muganga SACCO. Together, we build financial wellbeing and support the growth of Rwanda's healthcare sector." },
+    { title: "Community First", text: "Join a community of over 10,000 members who trust Muganga SACCO. Together, we build financial wellbeing and support the growth of Rwanda's healthcare sector." },
     { title: "Fast & Transparent", text: "Experience quick loan approvals with transparent terms and no hidden fees. Our streamlined process ensures you get the funds you need when you need them most." },
   ];
 
@@ -103,6 +105,27 @@ export default function HomePage(){
       .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    fetch(`${API_BASE}/products?type=loan&is_featured=true&is_active=true&limit=5`)
+      .then(r => r.json())
+      .then(res => { if (res.success) setFeaturedLoans(res.data || []); })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/news?status=published&section=publications&subsection=annual_report&limit=50`)
+      .then(r => r.json())
+      .then(res => { if (res.success) setReports(res.data?.items || res.data || []); })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/news?status=published&limit=1`)
+      .then(r => r.json())
+      .then(res => { if (res.success) setNewsList(res.data?.items || res.data || []); })
+      .catch(() => {});
+  }, []);
+
   return (
     <div style={{ fontFamily: "'Segoe UI', sans-serif", color: "#1a1a1a", overflowX: "hidden" }}>
 
@@ -112,7 +135,7 @@ export default function HomePage(){
         <div style={{ padding:"60px 40px 60px 60px", display:"flex", flexDirection:"column", justifyContent:"center" }}>
           <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:18 }}>
             <CheckCircle2 size={18} color={G}/>
-            <span style={{ fontSize:13, color:"#555" }}>Trusted by 10,000+ healthcare professionals</span>
+            <span style={{ fontSize:13, color:"#555" }}>Trusted by 10,000+ members</span>
           </div>
           <h1 style={{ fontSize:42, fontWeight:800, lineHeight:1.2, margin:"0 0 12px" }}>
             Empowering Healthcare<br/>Professionals to<br/>
@@ -124,10 +147,10 @@ export default function HomePage(){
             Access affordable loans, competitive savings, and digital financial solutions designed specifically for Rwanda's healthcare community.
           </p>
           <div style={{ display:"flex", gap:14 }}>
-            <button style={{ display:"flex", alignItems:"center", gap:8, background:G, color:"white", border:"none", borderRadius:8, padding:"13px 24px", fontWeight:700, fontSize:14, cursor:"pointer" }}>
+            <button onClick={() => navigate("/products")} style={{ display:"flex", alignItems:"center", gap:8, background:G, color:"white", border:"none", borderRadius:8, padding:"13px 24px", fontWeight:700, fontSize:14, cursor:"pointer" }}>
               Explore Products <ArrowRight size={16}/>
             </button>
-            <button style={{ display:"flex", alignItems:"center", gap:8, background:"white", color:G, border:`1.5px solid ${G}`, borderRadius:8, padding:"13px 24px", fontWeight:600, fontSize:14, cursor:"pointer" }}>
+            <button onClick={() => navigate("/membership")} style={{ display:"flex", alignItems:"center", gap:8, background:"white", color:G, border:`1.5px solid ${G}`, borderRadius:8, padding:"13px 24px", fontWeight:600, fontSize:14, cursor:"pointer" }}>
               Open an Account <ArrowRight size={16}/>
             </button>
           </div>
@@ -135,7 +158,7 @@ export default function HomePage(){
 
         {/* Right — hero video */}
         <div style={{ position:"relative", width:"100%", height:"100%", overflow:"hidden" }}>
-          <video src="/videosacco.mp4" autoPlay muted loop playsInline style={{ width:"100%", height:"100%", objectFit:"cover", display:"block", position:"absolute", inset:0 }} />
+          <video src="/InternetBanking_vid.mp4" autoPlay muted loop playsInline style={{ width:"100%", height:"100%", objectFit:"cover", display:"block", position:"absolute", inset:0 }} />
           <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,.45)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
             <div style={{ position:"relative", width:"100%", maxWidth:360, textAlign:"center", padding:"0 24px" }}>
               {SLIDES.map((s, i) => (
@@ -149,8 +172,8 @@ export default function HomePage(){
               {SLIDES.map((_, i) => (
                 <div key={i} style={{ width: i===slideIdx?20:8, height:8, borderRadius:4, background: i===slideIdx?"white":"rgba(255,255,255,.4)", transition:"width .3s" }} />
               ))}
-            </div>
           </div>
+        </div>
         </div>
       </section>
 
@@ -181,14 +204,27 @@ export default function HomePage(){
         <div style={{ background:G, borderRadius:16, padding:"28px 24px", color:"white" }}>
           <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, marginBottom:20, opacity:.8 }}>FEATURED LOAN PRODUCTS</div>
           <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-            {LOANS.map(({icon,label,sub,rate})=>(
-              <div key={label} style={{ display:"flex", alignItems:"center", gap:14, background:"rgba(255,255,255,.1)", borderRadius:10, padding:"14px 16px" }}>
-                <div style={{ width:48, height:48, borderRadius:"50%", border:"2px solid rgba(255,255,255,.4)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{icon}</div>
+            {featuredLoans.length > 0 ? featuredLoans.map(p => (
+              <div key={p.id} style={{ display:"flex", alignItems:"center", gap:14, background:"rgba(255,255,255,.1)", borderRadius:10, padding:"14px 16px" }}>
+                <div style={{ width:48, height:48, borderRadius:"50%", border:"2px solid rgba(255,255,255,.4)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{getIcon(p.icon)}</div>
                 <div style={{ flex:1 }}>
-                  <div style={{ fontWeight:700, fontSize:14 }}>{label}</div>
-                  <div style={{ fontSize:12, opacity:.75 }}>{sub}</div>
+                  <div style={{ fontWeight:700, fontSize:14 }}>{p.title}</div>
                 </div>
-                <div style={{ background:O, borderRadius:8, padding:"6px 12px", fontWeight:800, fontSize:13, whiteSpace:"nowrap" }}>{rate} p.a.</div>
+                <div style={{ background:O, borderRadius:8, padding:"6px 12px", fontWeight:800, fontSize:13, whiteSpace:"nowrap" }}>{p.interest_rate}% {p.interest_period === "monthly" ? "p.m." : "p.a."}</div>
+                <button onClick={() => navigate("/products")} style={{ background:"rgba(255,255,255,.15)", color:"white", border:"1px solid rgba(255,255,255,.3)", borderRadius:6, padding:"6px 10px", fontSize:11, fontWeight:700, cursor:"pointer", whiteSpace:"nowrap" }}>More Details</button>
+              </div>
+            )) : [
+              { label: "Housing Loan", sub: "Up to 15 years", rate: "10%", icon: "home" },
+              { label: "Business Loan", sub: "Up to 15 years", rate: "14%", icon: "briefcase" },
+              { label: "Emergency Loan", sub: "Quick approval", rate: "16%", icon: "plus" },
+            ].map(f => (
+              <div key={f.label} style={{ display:"flex", alignItems:"center", gap:14, background:"rgba(255,255,255,.1)", borderRadius:10, padding:"14px 16px" }}>
+                <div style={{ width:48, height:48, borderRadius:"50%", border:"2px solid rgba(255,255,255,.4)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{getIcon(f.icon)}</div>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontWeight:700, fontSize:14 }}>{f.label}</div>
+                </div>
+                <div style={{ background:O, borderRadius:8, padding:"6px 12px", fontWeight:800, fontSize:13, whiteSpace:"nowrap" }}>{f.rate} p.a.</div>
+                <button onClick={() => navigate("/products")} style={{ background:"rgba(255,255,255,.15)", color:"white", border:"1px solid rgba(255,255,255,.3)", borderRadius:6, padding:"6px 10px", fontSize:11, fontWeight:700, cursor:"pointer", whiteSpace:"nowrap" }}>More Details</button>
               </div>
             ))}
           </div>
@@ -198,7 +234,7 @@ export default function HomePage(){
                 <CheckCircle2 size={13}/> {t}
               </div>
             ))}
-            <button onClick={() => navigate("/products")} style={{ background:O, color:"white", border:"none", borderRadius:6, padding:"6px 14px", fontSize:12, fontWeight:700, cursor:"pointer" }}>View all loan products</button>
+            <button onClick={() => navigate("/products")} style={{ background:O, color:"white", border:"none", borderRadius:6, padding:"6px 14px", fontSize:12, fontWeight:700, cursor:"pointer" }}>More Details</button>
           </div>
         </div>
 
@@ -215,7 +251,7 @@ export default function HomePage(){
               </div>
             ))}
           </div>
-          <button style={{ display:"flex", alignItems:"center", gap:8, background:G, color:"white", border:"none", borderRadius:8, padding:"13px 24px", fontWeight:700, fontSize:14, cursor:"pointer" }}>
+          <button onClick={() => navigate("/membership")} style={{ display:"flex", alignItems:"center", gap:8, background:G, color:"white", border:"none", borderRadius:8, padding:"13px 24px", fontWeight:700, fontSize:14, cursor:"pointer" }}>
             Open Savings Account <ArrowRight size={16}/>
           </button>
         </div>
@@ -240,7 +276,7 @@ export default function HomePage(){
           <div>
             <h2 style={{ fontSize:26, fontWeight:800, marginBottom:10 }}>Access Services Digitally</h2>
             <p style={{ color:"#555", fontSize:14, lineHeight:1.7, marginBottom:14 }}>Manage your account securely from anywhere.<br/>Fast, simple and always within reach.</p>
-            <a href="#" style={{ color:G, fontWeight:700, fontSize:14, textDecoration:"none", display:"flex", alignItems:"center", gap:6 }}>
+            <a href="#" onClick={e => { e.preventDefault(); navigate("/digital"); }} style={{ color:G, fontWeight:700, fontSize:14, textDecoration:"none", display:"flex", alignItems:"center", gap:6 }}>
               Explore digital services <ArrowRight size={15}/>
             </a>
           </div>
@@ -283,18 +319,18 @@ export default function HomePage(){
           <div>
             <h3 style={{ fontSize:20, fontWeight:800, marginBottom:14 }}>Serving Rwanda's<br/>Healthcare Community</h3>
             <div style={{ display:"flex", flexDirection:"column", gap:9, marginBottom:16 }}>
-              {["Solutions designed specifically for healthcare professionals","Understand your unique financial needs","Supporting your growth and wellbeing","Building a stronger healthcare community together"].map(t=>(
+              {["Solutions designed specifically for our members","Understand your unique financial needs","Supporting your growth and wellbeing","Building a stronger healthcare community together"].map(t=>(
                 <div key={t} style={{ display:"flex", alignItems:"flex-start", gap:8, fontSize:13, color:"#444" }}>
                   <CheckCircle2 size={15} color={G} style={{marginTop:2, flexShrink:0}}/> {t}
                 </div>
               ))}
             </div>
-            <p style={{ color:"#555", fontSize:13, lineHeight:1.6 }}>Join thousands of healthcare professionals who trust Muganga SACCO for their financial journey.</p>
+            <p style={{ color:"#555", fontSize:13, lineHeight:1.6 }}>Join thousands of members who trust Muganga SACCO for their financial journey.</p>
           </div>
 
           {/* Provider Image */}
           <div style={{ display:"flex", alignItems:"center", justifyContent:"center" }}>
-            <img src="/provider-Circle.png" alt="Provider" style={{ width:288, height:288, objectFit:"contain" }} />
+            <img src={lnrsCircle} alt="Provider" style={{ width:288, height:288, objectFit:"contain" }} />
           </div>
 
           {/* Video Guides */}
@@ -302,15 +338,22 @@ export default function HomePage(){
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
               <h3 style={{ fontSize:20, fontWeight:800 }}>Video Guides</h3>
               <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-                <a href="#" style={{ color:G, fontSize:13, fontWeight:600, textDecoration:"none", display:"flex", alignItems:"center", gap:4 }}>View all guides <ArrowRight size={14}/></a>
+                <a href="#" onClick={e => { e.preventDefault(); navigate("/guides"); }} style={{ color:G, fontSize:13, fontWeight:600, textDecoration:"none", display:"flex", alignItems:"center", gap:4 }}>View all guides <ArrowRight size={14}/></a>
             </div>
             </div>
-            <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-              {videos.map(v => (
-                <div key={v.id} onClick={() => v.video_url && window.open(v.video_url, "_blank")} style={{ display:"flex", alignItems:"center", gap:12, background:"white", borderRadius:10, padding:"10px 14px", boxShadow:"0 1px 6px rgba(0,0,0,.07)", cursor:v.video_url?"pointer":"default" }}>
-                  <div style={{ position:"relative", width:60, height:40, borderRadius:6, background:"#1a1a1a", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                    <Play size={18} color="white" fill="white"/>
-                    {v.duration && <span style={{ position:"absolute", bottom:3, right:4, color:"white", fontSize:10, fontWeight:700 }}>{v.duration}</span>}
+            <div style={{ display:"flex", flexDirection:"column", gap:10, maxHeight:340, overflowY:"auto", paddingRight:4 }}>
+              {(videos.length > 4 ? videos.slice(0, 4) : videos).map(v => (
+                <div key={v.id} onClick={() => v.video_url && window.open(v.video_url.startsWith("http") ? v.video_url : `https://${v.video_url}`, "_blank")} style={{ display:"flex", alignItems:"center", gap:12, background:"white", borderRadius:10, padding:"10px 14px", boxShadow:"0 1px 6px rgba(0,0,0,.07)", cursor:v.video_url?"pointer":"default" }}>
+                  <div style={{ position:"relative", width:80, height:50, borderRadius:6, overflow:"hidden", background:"#1a1a1a", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    {getYouTubeThumb(v.thumbnail || v.video_url) ? (
+                      <img src={getYouTubeThumb(v.thumbnail || v.video_url)} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                    ) : (
+                      <Play size={18} color="white" fill="white"/>
+                    )}
+                    <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,.25)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      <Play size={18} color="white" fill="white"/>
+                    </div>
+                    {v.duration && <span style={{ position:"absolute", bottom:3, right:4, color:"white", fontSize:10, fontWeight:700, textShadow:"0 1px 3px rgba(0,0,0,.7)" }}>{v.duration}</span>}
                   </div>
                   <div>
                     <div style={{ fontWeight:600, fontSize:13 }}>{v.title}</div>
@@ -322,11 +365,40 @@ export default function HomePage(){
             </div>
           </div>
 
-          {/* Twitter Feed */}
+          {/* Publications — Annual Reports */}
           <div>
-            <h3 style={{ fontSize:20, fontWeight:800, marginBottom:14 }}>X Feed</h3>
-            <div style={{ background:"white", borderRadius:10, padding:10, boxShadow:"0 1px 6px rgba(0,0,0,.07)" }}>
-              <TwitterTimeline />
+            <h3 style={{ fontSize:22, fontWeight:800, marginBottom:2 }}>Publication</h3>
+            <div style={{ fontSize:18, color:"#666", marginBottom:14 }}>Annual Reports</div>
+            <div style={{ display:"flex", flexDirection:"column", gap:12, maxHeight:420, overflowY:"auto", paddingRight:4 }}>
+              {(() => {
+                if (!reports.length) return <p style={{ color:"#888", fontSize:12, textAlign:"center", padding:"10px 0" }}>No reports available</p>;
+                const grouped = {};
+                reports.forEach(r => {
+                  const yr = r.published_at ? new Date(r.published_at).getFullYear() : "Other";
+                  if (!grouped[yr]) grouped[yr] = [];
+                  grouped[yr].push(r);
+                });
+                const years = Object.keys(grouped).sort((a,b) => Number(b) - Number(a));
+                return years.map(year => (
+                  <div key={year}>
+                    {grouped[year].map(r => {
+                      const isFinancial = r.subsection === "financial_report";
+                      return (
+                        <div key={r.id} onClick={() => r.file_url && window.open(r.file_url, "_blank")} style={{ display:"flex", alignItems:"center", gap:10, background:"white", borderRadius:10, padding:"10px 12px", boxShadow:"0 1px 6px rgba(0,0,0,.07)", cursor:r.file_url?"pointer":"default", marginBottom:6 }}>
+                          <div style={{ width:36, height:36, borderRadius:8, background:isFinancial?O:G, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="18" height="18"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                          </div>
+                          <div style={{ flex:1 }}>
+                            <div style={{ fontWeight:600, fontSize:12 }}>{r.title}</div>
+                            <div style={{ color:"#888", fontSize:10, marginTop:1 }}>{isFinancial ? "Financial Report" : "Annual Report"}</div>
+                          </div>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ));
+              })()}
             </div>
           </div>
         </div>
@@ -342,10 +414,10 @@ export default function HomePage(){
           </div>
         </div>
         <div style={{ display:"flex", gap:14 }}>
-          <button style={{ background:"white", color:G, border:"none", borderRadius:8, padding:"13px 28px", fontWeight:700, fontSize:14, cursor:"pointer" }}>
+          <button onClick={() => navigate("/membership")} style={{ background:"white", color:G, border:"none", borderRadius:8, padding:"13px 28px", fontWeight:700, fontSize:14, cursor:"pointer" }}>
             Become a Member
           </button>
-          <button style={{ background:O, color:"white", border:"none", borderRadius:8, padding:"13px 28px", fontWeight:700, fontSize:14, cursor:"pointer" }}>
+          <button onClick={() => window.location.href = "https://ibank.mugangasacco.rw/"} style={{ background:O, color:"white", border:"none", borderRadius:8, padding:"13px 28px", fontWeight:700, fontSize:14, cursor:"pointer" }}>
             Apply for a Loan
           </button>
         </div>

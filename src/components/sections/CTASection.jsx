@@ -11,7 +11,7 @@ export default function CTASection() {
           Ready to Start Your Financial Journey?
         </h2>
         <p style={{ color: "#555", maxWidth: 540, margin: "0 auto 36px", lineHeight: 1.75, fontSize: "0.97rem" }}>
-          Join thousands of healthcare professionals who trust Muganga SACCO for their financial needs. Open an account today and take control of your financial future.
+          Join thousands of members who trust Muganga SACCO for their financial needs. Open an account today and take control of your financial future.
         </p>
         <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
           <a href="#products" className="btn-green">Get Started</a>

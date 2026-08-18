@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { FOOTER_QUICK_LINKS, FOOTER_SERVICES, CONTACT_INFO, IMPORTANT_INFO } from "../../constants";
 
 const FacebookIcon = () => (
@@ -32,14 +33,21 @@ const SOCIALS = [
 
 function FooterLink({ label, url }) {
   const isExternal = url.startsWith("http") || url.startsWith("/src/");
+  if (isExternal) {
+    return (
+      <a href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ display: "block", fontSize: "0.85rem", color: "#000", marginBottom: 10, transition: "color 0.2s" }}
+        onMouseEnter={e => e.target.style.color = "#000"}
+        onMouseLeave={e => e.target.style.color = "#000"}
+      >{label}</a>
+    );
+  }
   return (
-    <a href={url}
-      target={isExternal ? "_blank" : undefined}
-      rel={isExternal ? "noopener noreferrer" : undefined}
+    <Link to={url}
       style={{ display: "block", fontSize: "0.85rem", color: "#000", marginBottom: 10, transition: "color 0.2s" }}
-      onMouseEnter={e => e.target.style.color = "#000"}
-      onMouseLeave={e => e.target.style.color = "#000"}
-    >{label}</a>
+    >{label}</Link>
   );
 }
 
@@ -111,7 +119,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div style={{ paddingTop: 24, display: "flex", color:"#000", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
           <p style={{ fontSize: "0.8rem", color: "#000" }}>© 2026 Muganga SACCO. All rights reserved.</p>
-          <p style={{ fontSize: "0.8rem", color: "#000" }}>Regulated · Transparent · Trusted</p>
+          <p style={{ fontSize: "0.8rem", color: "#000" }}>Muganga SACCO is regulated by the National Bank of Rwanda</p>
         </div>
       </div>
     </footer>

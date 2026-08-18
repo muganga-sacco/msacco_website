@@ -1,67 +1,37 @@
-const services = [
-  {
-    icon: (
-      ""
-    ),
-    iconBg: "#e8f0eb", iconColor: "#2d6a4f",
-    title: "Mobile Banking App",
-    desc: "Access your account anywhere, anytime with our feature-rich mobile application. iOS and Android application are ",
-    features: ["Balance inquiries", "Fund transfers", "Loan applications", "Transaction history"],
-    cta: "Download App on Apple Store and Playstore",
-  },
-  {
-    icon: (
-      ""
-    ),
-    iconBg: "#e8f0eb", iconColor: "#2d6a4f",
-    title: "Internet Banking",
-    desc: "Manage your finances from your computer with our secure web portal.",
-    features: ["Account management", "Bill payments", "Statement downloads", "Profile updates"],
-    cta: "Access Portal",
-  },
-  {
-    icon: (
-      ""
-    ),
-    iconBg: "#e8f0eb", iconColor: "#2d6a4f",
-    title: "Debit Card Services",
-    desc: "Convenient access to your funds with our VISA debit card.",
-    features: ["ATM withdrawals", "POS payments", "Online shopping", "Contactless payments"],
-    cta: "Request Card",
-  },
-  {
-    icon: (
-     ""
-    ),
-    iconBg: "#e8f0eb", iconColor: "#2d6a4f",
-    title: "USSD Banking",
-    desc: "Check balances, Do transfers and get quick loan via USSD application on any mobile device.",
-    features: ["Balance Check", "Transactions between account", "MoMo transfers","Quick loan request", "USSD access"],
-    cta: "Access it through *565#",
-  },
-  {
-    icon: (
-      ""
-    ),
-    iconBg: "#e8f0eb", iconColor: "#2d6a4f",
-    title: "Regular Support",
-    desc: "Get help anytime through our digital support channels, call center and other channel available.",
-    features: ["Call center", "Email support", "Online Support", "Video tutorials"],
-    cta: "Get Support",
-  },
+import { useState, useEffect } from "react";
+
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+const API_ORIGIN = API_BASE.replace(/\/api\/?$/, "");
+
+const FALLBACK_SERVICES = [
+  { title: "Mobile Banking App", description: "Access your account anywhere, anytime with our feature-rich mobile application. iOS and Android application are available.", icon_bg: "#e8f0eb", icon_color: "#2d6a4f", features: ["Balance inquiries", "Fund transfers", "Loan applications", "Transaction history"], cta_label: "Download App on Apple Store and Playstore" },
+  { title: "Internet Banking", description: "Manage your finances from your computer with our secure web portal.", icon_bg: "#e8f0eb", icon_color: "#2d6a4f", features: ["Account management", "Bill payments", "Statement downloads", "Profile updates"], cta_label: "Access Portal" },
+  { title: "Debit Card Services", description: "Convenient access to your funds with our VISA debit card.", icon_bg: "#e8f0eb", icon_color: "#2d6a4f", features: ["ATM withdrawals", "POS payments", "Online shopping", "Contactless payments"], cta_label: "Request Card" },
+  { title: "USSD Banking", description: "Check balances, Do transfers and get quick loan via USSD application on any mobile device.", icon_bg: "#e8f0eb", icon_color: "#2d6a4f", features: ["Balance Check", "Transactions between account", "MoMo transfers", "Quick loan request", "USSD access"], cta_label: "Access it through *565#" },
+  { title: "Regular Support", description: "Get help anytime through our digital support channels, call center and other channel available.", icon_bg: "#e8f0eb", icon_color: "#2d6a4f", features: ["Call center", "Email support", "Online Support", "Video tutorials"], cta_label: "Get Support" },
 ];
 
 export default function DigitalBanking() {
+  const [services, setServices] = useState([]);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/digital-services`)
+      .then(r => r.json())
+      .then(res => {
+        if (res.success && res.data && res.data.length) setServices(res.data);
+        else setServices(FALLBACK_SERVICES);
+      })
+      .catch(() => setServices(FALLBACK_SERVICES));
+  }, []);
+
   return (
     <div className="db-page">
-
-
       {/* HERO — full-width gradient wrapper */}
       <div className="db-hero-wrap">
         <div className="db-hero">
           <div className="hero-left">
             <h1>Digital Banking Made Simple</h1>
-            <p>Access your Muganga SACCO account 24/7 with our comprehensive suite of digital banking services designed for healthcare professionals on the go.</p>
+            <p>Access your Muganga SACCO account 24/7 with our comprehensive suite of digital banking services designed for members on the go.</p>
             <div className="hero-btns">
               <button className="btn-primary">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
@@ -95,16 +65,20 @@ export default function DigitalBanking() {
         <p>Experience banking without boundaries with our full range of digital solutions.</p>
         <div className="services-grid">
           {services.map((s, i) => (
-            <div className="service-card" key={i}>
-              <div className="svc-icon" style={{ background: s.iconBg, color: s.iconColor }}>{s.icon}</div>
+            <div className="service-card" key={s.id || i}>
+              {s.image_url ? <img src={s.image_url.startsWith("/") ? API_ORIGIN + s.image_url : s.image_url} alt={s.title} style={{ width:"100%", height:180, objectFit:"cover", display:"block", borderRadius:10, marginBottom:4 }} /> : <div className="svc-icon" style={{ background: s.icon_bg || "#e8f0eb", color: s.icon_color || "#2d6a4f" }}></div>}
               <div className="svc-title">{s.title}</div>
-              <div className="svc-desc">{s.desc}</div>
+              <div className="svc-desc">{s.description}</div>
               <ul className="svc-features">
-                {s.features.map((f, j) => (
+                {(s.features || []).map((f, j) => (
                   <li key={j}><span className="svc-dot" />{f}</li>
                 ))}
               </ul>
-              <button className="svc-btn">{s.cta}</button>
+              {s.cta_label && (s.cta_link ? (
+                <a href={s.cta_link} target="_blank" rel="noopener noreferrer" className="svc-btn">{s.cta_label}</a>
+              ) : (
+                <button className="svc-btn">{s.cta_label}</button>
+              ))}
             </div>
           ))}
         </div>

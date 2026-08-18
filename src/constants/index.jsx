@@ -27,16 +27,16 @@ export const NAV_LINKS = [
 ];
 
 export const FEATURES = [
-  { icon: <Percent size={20} />, title: "Lowest Interest Rates", desc: "Competitive loan rates starting at 10% — the most affordable in the market for healthcare professionals." },
+  { icon: <Percent size={20} />, title: "Lowest Interest Rates", desc: "Competitive loan rates starting at 10% — the most affordable in the market for our members." },
   { icon: <Smartphone size={20} />, title: "Digital Banking", desc: "Access your account anytime, anywhere with our mobile app and internet banking platform." },
   { icon: <Zap size={20} />, title: "Fast Approval", desc: "Get loan decisions within 24 hours with our streamlined application process." },
   { icon: <TrendingUp size={20} />, title: "Competitive Returns", desc: "Earn attractive interest on your savings with our flexible savings accounts." },
-  { icon: <Users size={20} />, title: "Community Support", desc: "Join a community of healthcare professionals working together towards financial stability." },
+  { icon: <Users size={20} />, title: "Community Support", desc: "Join a community of members working together towards financial stability." },
   { icon: <Shield size={20} />, title: "Secure & Regulated", desc: "Your deposits are safe with full regulatory compliance and transparent operations." },
 ];
 
 export const STATS = [
-  { value: "12,000+", label: "Health Professionals" },
+  { value: "12,000+", label: "Active Members" },
   { value: "10%", label: "Interest Rate" },
   { value: "24/7", label: "Digital Access" },
   { value: "24h", label: "Loan Approval" },
@@ -60,14 +60,14 @@ export const FOOTER_QUICK_LINKS = [
   {text:"Board Members", href:"/board"},
   {text:"Careers", href:"/careers"},
   {text: "News/Tenders", href:"/news"}, 
-  {text:"Video Guides", href:"/guides"},
 ];
 
 export const FOOTER_SERVICES    = [
   {text: "Digital Services", href:"/digital"},
   {text: "Market Trends" , href:"#"}, 
   {text: "Internet Banking" , href:"https://ibank.mugangasacco.rw/"}, 
-  {text: "Help & Tutorials" , href:"/guides"}
+  {text:"Video Guides", href:"/guides"},
+  {text: "Help" , href:"/contactus"}
 ];
 
 export const CONTACT_INFO = [

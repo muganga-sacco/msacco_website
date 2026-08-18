@@ -191,7 +191,7 @@ export default function ContactPage() {
           <h1 className="ct-hero-title">Contact <span>Muganga SACCO</span></h1>
           <p className="ct-hero-desc">
             Have a question about your account, products, or services? Our team is ready to assist
-            healthcare professionals across Rwanda.
+            members across Rwanda.
           </p>
         </div>
       </section>
