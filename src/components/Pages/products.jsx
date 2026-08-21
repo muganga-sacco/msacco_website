@@ -333,8 +333,8 @@ export default function Products() {
     };
   };
 
-  const loanProducts = allProducts.filter(p => p.type === "loan" && p.max_amount).map(toFrontend);
-  const savingsProducts = allProducts.filter(p => (p.type === "savings" || p.type === "saving") && p.max_amount).map(toFrontend);
+  const loanProducts = allProducts.filter(p => p.type === "loan").map(toFrontend);
+  const savingsProducts = allProducts.filter(p => p.type === "savings" || p.type === "saving").map(toFrontend);
 
   const products = isLoans ? loanProducts : savingsProducts;
   const type = isLoans ? "loan" : "savings";
