@@ -234,6 +234,7 @@ export default function Careers() {
   const [openings, setOpenings] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
+  const [modalLoading, setModalLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -250,11 +251,6 @@ export default function Careers() {
               dept: j.department,
               location: j.location || "Kigali",
               desc: j.description || "",
-              max_age: j.max_age,
-              requirements: Array.isArray(j.requirements) ? j.requirements : [],
-              benefits: Array.isArray(j.benefits) ? j.benefits : [],
-              salary_range: j.salary_range || "",
-              employment_type: j.employment_type || "",
             }))
           );
         }
@@ -265,6 +261,42 @@ export default function Careers() {
       }
     })();
   }, []);
+
+  const openJobModal = async (job) => {
+    setSelectedJob({ ...job, _loading: true });
+    setModalLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/careers/${job.id}`);
+      const json = await res.json();
+      if (json.success && json.data) {
+        const d = json.data;
+        setSelectedJob({
+          id: d.id,
+          title: d.title,
+          dept: d.department,
+          location: d.location || "Kigali",
+          type: formatEmploymentType(d.employment_type),
+          desc: d.description || "",
+          requirements: Array.isArray(d.requirements) ? d.requirements : [],
+          benefits: Array.isArray(d.benefits) ? d.benefits : [],
+          key_deliverables: Array.isArray(d.key_deliverables) ? d.key_deliverables : [],
+          skills_competencies: Array.isArray(d.skills_competencies) ? d.skills_competencies : [],
+          personal_attributes: Array.isArray(d.personal_attributes) ? d.personal_attributes : [],
+          application_procedures: d.application_procedures || "",
+          salary_range: d.salary_range || "",
+          deadline: formatDate(d.deadline),
+          max_age: d.max_age || null,
+          posted: formatDate(d.posted_at || d.deadline),
+          _loading: false,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to fetch job detail:", err);
+      setSelectedJob((prev) => prev ? { ...prev, _loading: false } : null);
+    } finally {
+      setModalLoading(false);
+    }
+  };
 
   return (
     <div className="careers-page">
@@ -326,7 +358,7 @@ export default function Careers() {
                 </div>
                 {job.posted && <div className="job-deadline">Deadline to Apply: {job.posted}</div>}
                 <p className="job-desc">{job.desc}</p>
-                <button className="apply-btn" onClick={() => setSelectedJob(job)}>More details</button>
+                <button className="apply-btn" onClick={() => openJobModal(job)}>More details</button>
               </div>
             ))}
           </div>
@@ -336,34 +368,132 @@ export default function Careers() {
       {selectedJob && (
         <div className="modal-overlay" onClick={() => setSelectedJob(null)}>
           <div className="job-modal" onClick={e => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setSelectedJob(null)}>
+            <button className="modal-close" onClick={() => setSelectedJob(null)} aria-label="Close">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
-            <div className="job-modal-type">{selectedJob.type}</div>
-            <div className="job-modal-title">{selectedJob.title}</div>
-            <div className="job-modal-meta">
-              <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg> {selectedJob.dept}</span>
-              <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> {selectedJob.location}</span>
-              {selectedJob.salary_range && <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> {selectedJob.salary_range}</span>}
-            </div>
-            {selectedJob.posted && <div className="job-modal-deadline">Deadline to Apply: {selectedJob.posted}</div>}
-            <p className="job-modal-desc">{selectedJob.desc}</p>
 
-            {selectedJob.requirements.length > 0 && (
-              <div className="job-modal-section">
-                <h4>Responsibilities</h4>
-                <ul>{selectedJob.requirements.map((r, i) => <li key={i}>{r}</li>)}</ul>
+            {selectedJob._loading ? (
+              <div className="job-modal-loading">Loading job details…</div>
+            ) : (
+              <div className="job-modal-layout">
+                {/* ── Main content column ── */}
+                <div className="job-modal-body">
+                  <div className="job-modal-type">{selectedJob.type}</div>
+                  <div className="job-modal-title">{selectedJob.title}</div>
+                  <div className="job-modal-meta">
+                    <span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                      {selectedJob.dept}
+                    </span>
+                    <span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      {selectedJob.location}
+                    </span>
+                  </div>
+
+                  {selectedJob.desc && <p className="job-modal-desc">{selectedJob.desc}</p>}
+
+                  {selectedJob.requirements?.length > 0 && (
+                    <div className="job-modal-section">
+                      <h4>Requirements</h4>
+                      <ul>{selectedJob.requirements.map((r, i) => <li key={i}>{r}</li>)}</ul>
+                    </div>
+                  )}
+
+                  {selectedJob.key_deliverables?.length > 0 && (
+                    <div className="job-modal-section">
+                      <h4>Key Deliverables</h4>
+                      <ul>{selectedJob.key_deliverables.map((r, i) => <li key={i}>{r}</li>)}</ul>
+                    </div>
+                  )}
+
+                  {selectedJob.skills_competencies?.length > 0 && (
+                    <div className="job-modal-section">
+                      <h4>Skills &amp; Competencies</h4>
+                      <ul>{selectedJob.skills_competencies.map((r, i) => <li key={i}>{r}</li>)}</ul>
+                    </div>
+                  )}
+
+                  {selectedJob.personal_attributes?.length > 0 && (
+                    <div className="job-modal-section">
+                      <h4>Personal Attributes</h4>
+                      <ul>{selectedJob.personal_attributes.map((r, i) => <li key={i}>{r}</li>)}</ul>
+                    </div>
+                  )}
+
+                  {selectedJob.benefits?.length > 0 && (
+                    <div className="job-modal-section">
+                      <h4>Benefits</h4>
+                      <ul>{selectedJob.benefits.map((b, i) => <li key={i}>{b}</li>)}</ul>
+                    </div>
+                  )}
+
+                  {selectedJob.application_procedures && (
+                    <div className="job-modal-section">
+                      <h4>How to Apply</h4>
+                      <div className="job-modal-procedures">
+                        {selectedJob.application_procedures.split(/\n+/).map((line, i) =>
+                          line.trim() ? <p key={i}>{line.trim()}</p> : null
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    className="job-modal-apply"
+                    onClick={() => { setSelectedJob(null); navigate(`/apply/${selectedJob.id}`); }}
+                  >
+                    Apply Now
+                  </button>
+                </div>
+
+                {/* ── Sidebar ── */}
+                <aside className="job-modal-sidebar">
+                  {selectedJob.deadline && (
+                    <div className="jms-item">
+                      <div className="jms-label">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        Application Deadline
+                      </div>
+                      <div className="jms-value jms-deadline">{selectedJob.deadline}</div>
+                    </div>
+                  )}
+                  {selectedJob.salary_range && (
+                    <div className="jms-item">
+                      <div className="jms-label">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        Salary Range
+                      </div>
+                      <div className="jms-value">{selectedJob.salary_range}</div>
+                    </div>
+                  )}
+                  {selectedJob.max_age && (
+                    <div className="jms-item">
+                      <div className="jms-label">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                        Maximum Age
+                      </div>
+                      <div className="jms-value">{selectedJob.max_age} years</div>
+                    </div>
+                  )}
+                  {selectedJob.type && (
+                    <div className="jms-item">
+                      <div className="jms-label">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                        Employment Type
+                      </div>
+                      <div className="jms-value">{selectedJob.type}</div>
+                    </div>
+                  )}
+                  <button
+                    className="job-modal-apply jms-apply-btn"
+                    onClick={() => { setSelectedJob(null); navigate(`/apply/${selectedJob.id}`); }}
+                  >
+                    Apply Now
+                  </button>
+                </aside>
               </div>
             )}
-
-            {selectedJob.benefits.length > 0 && (
-              <div className="job-modal-section">
-                <h4>Requirements</h4>
-                <ul>{selectedJob.benefits.map((b, i) => <li key={i}>{b}</li>)}</ul>
-              </div>
-            )}
-
-            <button className="job-modal-apply" onClick={() => { setSelectedJob(null); navigate(`/apply/${selectedJob.id}`); }}>Apply Now</button>
           </div>
         </div>
       )}

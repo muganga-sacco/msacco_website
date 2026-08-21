@@ -213,7 +213,7 @@ export default function HomePage(){
                 <div style={{ flex:1 }}>
                   <div style={{ fontWeight:700, fontSize:14 }}>{p.title}</div>
                 </div>
-                <div style={{ background:O, borderRadius:8, padding:"6px 12px", fontWeight:800, fontSize:13, whiteSpace:"nowrap" }}>{p.interest_rate}% {p.interest_period === "monthly" ? "p.m." : "p.a."}</div>
+                {/* <div style={{ background:O, borderRadius:8, padding:"6px 12px", fontWeight:800, fontSize:13, whiteSpace:"nowrap" }}>{p.interest_rate}% {p.interest_period === "monthly" ? "p.m." : "p.a."}</div> */}
                 <button onClick={() => navigate("/products")} style={{ background:"rgba(255,255,255,.15)", color:"white", border:"1px solid rgba(255,255,255,.3)", borderRadius:6, padding:"6px 10px", fontSize:11, fontWeight:700, cursor:"pointer", whiteSpace:"nowrap" }}>More Details</button>
               </div>
             )) : [
@@ -226,7 +226,7 @@ export default function HomePage(){
                 <div style={{ flex:1 }}>
                   <div style={{ fontWeight:700, fontSize:14 }}>{f.label}</div>
                 </div>
-                <div style={{ background:O, borderRadius:8, padding:"6px 12px", fontWeight:800, fontSize:13, whiteSpace:"nowrap" }}>{f.rate} p.a.</div>
+                {/* <div style={{ background:O, borderRadius:8, padding:"6px 12px", fontWeight:800, fontSize:13, whiteSpace:"nowrap" }}>{f.rate} p.a.</div> */}
                 <button onClick={() => navigate("/products")} style={{ background:"rgba(255,255,255,.15)", color:"white", border:"1px solid rgba(255,255,255,.3)", borderRadius:6, padding:"6px 10px", fontSize:11, fontWeight:700, cursor:"pointer", whiteSpace:"nowrap" }}>More Details</button>
               </div>
             ))}

@@ -111,12 +111,43 @@ function toFrontendBoardMember(api) {
 }
 
 function toApiJob(fp) {
-  return { title: fp.title, department: fp.department, location: fp.location||"Kigali", employment_type: (fp.type||"full-time").toLowerCase(), description: fp.desc||"", requirements: fp.responsibilities||[], benefits: fp.requirements||[], deadline: fp.deadline||null, max_age: fp.max_age ? parseInt(fp.max_age) : null };
+  return {
+    title: fp.title,
+    department: fp.department,
+    location: fp.location || "Kigali",
+    employment_type: (fp.type || "full-time").toLowerCase(),
+    description: fp.desc || "",
+    requirements: fp.requirements || [],
+    benefits: fp.benefits || [],
+    key_deliverables: fp.key_deliverables || [],
+    skills_competencies: fp.skills_competencies || [],
+    personal_attributes: fp.personal_attributes || [],
+    application_procedures: fp.application_procedures || "",
+    salary_range: fp.salary_range || "",
+    deadline: fp.deadline || null,
+    max_age: fp.max_age ? parseInt(fp.max_age) : null,
+  };
 }
 function toFrontendJob(api) {
   const et = (api.employment_type || "").toLowerCase();
-  const type = et === "full-time" ? "Full-time" : et === "part-time" ? "Part-time" : et === "contract" ? "Contract" : et.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase());
-  return { id: api.id, title: api.title, department: api.department, location: api.location, type, desc: api.description||"", responsibilities: Array.isArray(api.requirements)?api.requirements:[], requirements: Array.isArray(api.benefits)?api.benefits:[], deadline: api.deadline?api.deadline.split("T")[0]:"", max_age: api.max_age||"" };
+  const type = et === "full-time" ? "Full-time" : et === "part-time" ? "Part-time" : et === "contract" ? "Contract" : et === "internship" ? "Internship" : et.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+  return {
+    id: api.id,
+    title: api.title,
+    department: api.department,
+    location: api.location,
+    type,
+    desc: api.description || "",
+    requirements: Array.isArray(api.requirements) ? api.requirements : [],
+    benefits: Array.isArray(api.benefits) ? api.benefits : [],
+    key_deliverables: Array.isArray(api.key_deliverables) ? api.key_deliverables : [],
+    skills_competencies: Array.isArray(api.skills_competencies) ? api.skills_competencies : [],
+    personal_attributes: Array.isArray(api.personal_attributes) ? api.personal_attributes : [],
+    application_procedures: api.application_procedures || "",
+    salary_range: api.salary_range || "",
+    deadline: api.deadline ? api.deadline.split("T")[0] : "",
+    max_age: api.max_age || "",
+  };
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1180,12 +1211,32 @@ function ExamResultsModal({ onClose, user }) {
 // ══════════════════════════════════════════════════════════════════════════
 function JobModal({ initial, onClose, onSave }) {
   const isEdit = !!initial;
+  const blankArrays = { requirements: ["", ""], benefits: ["", ""], key_deliverables: ["", ""], skills_competencies: ["", ""], personal_attributes: ["", ""] };
   const [form, setForm] = useState(initial
-    ? { ...initial, responsibilities: [...(initial.responsibilities || ["", ""])], requirements: [...(initial.requirements || ["", ""])] }
-    : { title: "", department: "", location: "", type: "Full-time", desc: "", responsibilities: ["", ""], requirements: ["", ""], deadline: "", max_age: "" }
+    ? {
+        ...initial,
+        requirements:        [...(initial.requirements        || ["", ""])],
+        benefits:            [...(initial.benefits            || ["", ""])],
+        key_deliverables:    [...(initial.key_deliverables    || ["", ""])],
+        skills_competencies: [...(initial.skills_competencies || ["", ""])],
+        personal_attributes: [...(initial.personal_attributes || ["", ""])],
+      }
+    : { title: "", department: "", location: "", type: "Full-time", desc: "",
+        salary_range: "", application_procedures: "", deadline: "", max_age: "",
+        ...blankArrays }
   );
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
-  const handleSave = () => { if (!form.title.trim() || !form.department.trim()) return; onSave({ ...form, responsibilities: form.responsibilities.filter(r => r.trim()), requirements: form.requirements.filter(r => r.trim()) }); };
+  const handleSave = () => {
+    if (!form.title.trim() || !form.department.trim()) return;
+    onSave({
+      ...form,
+      requirements:        form.requirements.filter(r => r.trim()),
+      benefits:            form.benefits.filter(r => r.trim()),
+      key_deliverables:    form.key_deliverables.filter(r => r.trim()),
+      skills_competencies: form.skills_competencies.filter(r => r.trim()),
+      personal_attributes: form.personal_attributes.filter(r => r.trim()),
+    });
+  };
 
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
@@ -1202,25 +1253,49 @@ function JobModal({ initial, onClose, onSave }) {
           <div className="form-group"><label className="form-label">Location</label><input className="form-input" placeholder="e.g., Kigali" value={form.location} onChange={e => set("location", e.target.value)} /></div>
         </div>
 
-        <div className="form-group">
-          <label className="form-label">Job Type</label>
-          <select className="form-select" value={form.type} onChange={e => set("type", e.target.value)}>
-            <option value="Full-time">Full-time</option>
-            <option value="Part-time">Part-time</option>
-            <option value="Contract">Contract</option>
-          </select>
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">Job Type</label>
+            <select className="form-select" value={form.type} onChange={e => set("type", e.target.value)}>
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
+              <option value="Internship">Internship</option>
+            </select>
+          </div>
+          <div className="form-group"><label className="form-label">Salary Range</label><input className="form-input" placeholder="e.g., 500,000 - 800,000 RWF" value={form.salary_range} onChange={e => set("salary_range", e.target.value)} /></div>
         </div>
 
         <div className="form-group"><label className="form-label">Description</label><textarea className="form-textarea" placeholder="Brief job description" value={form.desc} onChange={e => set("desc", e.target.value)} /></div>
 
         <div className="form-group">
-          <label className="form-label">Responsibilities</label>
-          <DynList items={form.responsibilities} setItems={v => set("responsibilities", v)} placeholder="Responsibility" />
+          <label className="form-label">Requirements</label>
+          <DynList items={form.requirements} setItems={v => set("requirements", v)} placeholder="Requirement" />
         </div>
 
         <div className="form-group">
-          <label className="form-label">Requirements</label>
-          <DynList items={form.requirements} setItems={v => set("requirements", v)} placeholder="Requirement" />
+          <label className="form-label">Key Deliverables</label>
+          <DynList items={form.key_deliverables} setItems={v => set("key_deliverables", v)} placeholder="Deliverable" />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Skills &amp; Competencies</label>
+          <DynList items={form.skills_competencies} setItems={v => set("skills_competencies", v)} placeholder="Skill / Competency" />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Personal Attributes</label>
+          <DynList items={form.personal_attributes} setItems={v => set("personal_attributes", v)} placeholder="Attribute" />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Benefits</label>
+          <DynList items={form.benefits} setItems={v => set("benefits", v)} placeholder="Benefit" />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Job Application Procedures</label>
+          <textarea className="form-textarea" placeholder="Describe how candidates should apply…" value={form.application_procedures} onChange={e => set("application_procedures", e.target.value)} />
         </div>
 
         <div className="form-row">

@@ -374,7 +374,7 @@ export default function Products() {
                 {p.rateDisplay || p.rate > 0 ? (
                 <div className="rate-row">
                   {/* <span className={`rate-num ${type}`}>{p.rateDisplay || `${p.rate}%`}</span> */}
-                  <span className="rate-label">{p.rateLabel || "Annual Interest"}</span>
+                  {/* <span className="rate-label">{p.rateLabel || "Annual Interest"}</span> */}
                 </div>
                 ) : null}
                 <button className={`cta-btn ${type}`} onClick={() => setSelectedProduct(p)}>{p.cta}</button>

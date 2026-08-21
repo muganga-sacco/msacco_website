@@ -5,6 +5,20 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 
 const TABS = ["Personal Info", "Documents", "References"];
 
+function renderBulletSection(heading, items) {
+  if (!Array.isArray(items) || items.length === 0) return null;
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <h4 style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: "0.88rem", fontWeight: 700, color: "#1a1a14", marginBottom: 6 }}>{heading}</h4>
+      <ul style={{ listStyle: "disc", paddingLeft: 20, margin: 0 }}>
+        {items.map((item, i) => (
+          <li key={i} style={{ fontSize: "0.84rem", color: "#5a5a4a", lineHeight: 1.65 }}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export default function CareerApply() {
   const { jobId } = useParams();
   const navigate = useNavigate();
@@ -14,6 +28,7 @@ export default function CareerApply() {
   const [submitted, setSubmitted] = useState(false);
   const [tab, setTab] = useState(0);
   const [errors, setErrors] = useState({});
+  const [showJobDetail, setShowJobDetail] = useState(false);
 
   const [form, setForm] = useState({
     full_name: "",
@@ -39,7 +54,17 @@ export default function CareerApply() {
       try {
         const r = await fetch(`${API_BASE}/careers/${jobId}`);
         const j = await r.json();
-        if (j.success) setJob(j.data);
+        if (j.success && j.data) {
+          const d = j.data;
+          setJob({
+            ...d,
+            requirements: Array.isArray(d.requirements) ? d.requirements : [],
+            benefits: Array.isArray(d.benefits) ? d.benefits : [],
+            key_deliverables: Array.isArray(d.key_deliverables) ? d.key_deliverables : [],
+            skills_competencies: Array.isArray(d.skills_competencies) ? d.skills_competencies : [],
+            personal_attributes: Array.isArray(d.personal_attributes) ? d.personal_attributes : [],
+          });
+        }
       } catch (_) {}
       setLoading(false);
     })();
@@ -143,6 +168,81 @@ export default function CareerApply() {
         <p style={{ color: "#7a7a6a", fontSize: "0.92rem", marginBottom: 28 }}>
           {job.department} — {job.location}
         </p>
+      )}
+
+      {/* Job detail summary */}
+      {job && (
+        <div style={{ marginBottom: 32 }}>
+          {/* Meta bar */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 14 }}>
+            {job.salary_range && (
+              <div style={{ background: "#e8f0eb", borderRadius: 8, padding: "8px 14px", fontSize: "0.82rem" }}>
+                <span style={{ color: "#6a7a6a", fontWeight: 600, display: "block", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Salary Range</span>
+                <span style={{ color: "#1a4a2e", fontWeight: 700 }}>{job.salary_range}</span>
+              </div>
+            )}
+            {job.deadline && (
+              <div style={{ background: "#fdecea", borderRadius: 8, padding: "8px 14px", fontSize: "0.82rem" }}>
+                <span style={{ color: "#9a5a4a", fontWeight: 600, display: "block", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Deadline</span>
+                <span style={{ color: "#c1440e", fontWeight: 700 }}>
+                  {new Date(job.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                </span>
+              </div>
+            )}
+            {job.max_age && (
+              <div style={{ background: "#f0ede6", borderRadius: 8, padding: "8px 14px", fontSize: "0.82rem" }}>
+                <span style={{ color: "#8a7a6a", fontWeight: 600, display: "block", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Max Age</span>
+                <span style={{ color: "#1a1a14", fontWeight: 700 }}>{job.max_age} years</span>
+              </div>
+            )}
+            {job.employment_type && (
+              <div style={{ background: "#f0ede6", borderRadius: 8, padding: "8px 14px", fontSize: "0.82rem" }}>
+                <span style={{ color: "#8a7a6a", fontWeight: 600, display: "block", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Type</span>
+                <span style={{ color: "#1a1a14", fontWeight: 700 }}>
+                  {job.employment_type.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Toggle full description */}
+          <button
+            type="button"
+            onClick={() => setShowJobDetail(v => !v)}
+            style={{
+              background: "none", border: "1px solid #d4d0c8", borderRadius: 8,
+              padding: "8px 16px", fontSize: "0.83rem", color: "#5a5a4a",
+              cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
+              fontFamily: "'Source Sans 3', sans-serif",
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+            </svg>
+            {showJobDetail ? "Hide job description" : "View full job description"}
+          </button>
+
+          {showJobDetail && (
+            <div style={{ background: "#fafaf7", border: "1px solid #e4e0d8", borderRadius: 12, padding: "24px 22px", marginTop: 12 }}>
+              {job.description && (
+                <p style={{ fontSize: "0.88rem", color: "#5a5a4a", lineHeight: 1.65, marginBottom: 16 }}>{job.description}</p>
+              )}
+              {renderBulletSection("Requirements", job.requirements)}
+              {renderBulletSection("Key Deliverables", job.key_deliverables)}
+              {renderBulletSection("Skills & Competencies", job.skills_competencies)}
+              {renderBulletSection("Personal Attributes", job.personal_attributes)}
+              {renderBulletSection("Benefits", job.benefits)}
+              {job.application_procedures && (
+                <div style={{ marginBottom: 16 }}>
+                  <h4 style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: "0.88rem", fontWeight: 700, color: "#1a1a14", marginBottom: 6 }}>How to Apply</h4>
+                  {job.application_procedures.split(/\n+/).map((line, i) =>
+                    line.trim() ? <p key={i} style={{ fontSize: "0.85rem", color: "#5a5a4a", lineHeight: 1.6, margin: "0 0 4px" }}>{line.trim()}</p> : null
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       )}
 
       {/* Tab indicators */}
