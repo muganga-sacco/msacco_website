@@ -320,6 +320,7 @@ export default function CareerApply() {
               <option value="Single">Single</option>
               <option value="Divorced">Divorced</option>
               <option value="Widowed">Widowed</option>
+              <option value="Others">Others</option>
             </select>
             {errors.marital_status && <div style={errorStyle}>{errors.marital_status}</div>}
           </div>
