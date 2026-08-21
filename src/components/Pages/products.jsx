@@ -396,7 +396,8 @@ export default function Products() {
               </div>
             ))}
           </div>
-          <button className={`start-btn ${type}`}>Start Application</button>
+          {/* <button className={`start-btn ${type}`}>Start Application</button> */}
+          <a href="https://ibank.mugangasacco.rw/" className={`start-btn ${type}`}>Start Application</a>
         </div>
       </div>
 

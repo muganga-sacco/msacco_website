@@ -3226,19 +3226,44 @@ input:focus, select:focus { border-color: #1a4a2e !important; box-shadow: 0 0 0 
           background: #fff;
           border: 1px solid #e4e0d8;
           border-radius: 14px;
-          padding: 22px 20px 20px;
+          overflow: hidden;
           display: flex;
           flex-direction: column;
-          gap: 10px;
           transition: transform 0.2s, box-shadow 0.2s;
         }
-        .service-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.07); }
+        .service-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.09); }
 
-        .svc-icon {
-          width: 42px; height: 42px;
-          border-radius: 11px;
-          display: flex; align-items: center; justify-content: center;
+        /* card image area */
+        .svc-card-img-wrap {
+          width: 100%;
+          aspect-ratio: 4/3;
+          overflow: hidden;
+          background: #f0f4f0;
           flex-shrink: 0;
+        }
+        .svc-card-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+        .svc-card-img-placeholder {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        /* card bottom bar */
+        .svc-card-info {
+          padding: 14px 16px 16px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          gap: 10px;
+          flex: 1;
         }
         .svc-title {
           font-family: Arial, Helvetica, sans-serif;
@@ -3246,25 +3271,126 @@ input:focus, select:focus { border-color: #1a4a2e !important; box-shadow: 0 0 0 
           font-weight: 600;
           color: #1a1a14;
         }
-        .svc-desc {
-          font-size: 0.84rem;
-          color: #6a6a5a;
-          font-weight: 300;
-          line-height: 1.5;
-        }
-        .svc-features {
-          list-style: none;
-          display: flex;
-          flex-direction: column;
-          gap: 5px;
-          flex: 1;
-        }
-        .svc-features li {
+
+        /* "More Details" button */
+        .svc-details-btn {
           display: flex;
           align-items: center;
-          gap: 7px;
-          font-size: 0.83rem;
-          color: #4a4a3a;
+          justify-content: center;
+          gap: 6px;
+          width: 100%;
+          padding: 10px 16px;
+          background: #1a4a2e;
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          font-family: 'Source Sans 3', sans-serif;
+          font-size: 0.85rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: opacity 0.18s;
+          margin-top: auto;
+        }
+        .svc-details-btn:hover { opacity: 0.85; }
+
+        /* ── Service Modal ─────────────────────────── */
+        .svc-modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.52);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9000;
+          padding: 20px;
+        }
+        .svc-modal {
+          background: #fff;
+          border-radius: 16px;
+          width: 100%;
+          max-width: 520px;
+          max-height: 88vh;
+          overflow-y: auto;
+          position: relative;
+          box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+          display: flex;
+          flex-direction: column;
+        }
+        .svc-modal-img {
+          width: 100%;
+          max-height: 260px;
+          object-fit: cover;
+          display: block;
+          border-radius: 16px 16px 0 0;
+          flex-shrink: 0;
+        }
+        .svc-modal-img-placeholder {
+          width: 100%;
+          height: 140px;
+          border-radius: 16px 16px 0 0;
+          flex-shrink: 0;
+        }
+        .svc-modal-close {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.92);
+          border: none;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #1a1a14;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          transition: background 0.15s;
+        }
+        .svc-modal-close:hover { background: #fff; }
+        .svc-modal-body {
+          padding: 22px 24px 28px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .svc-modal-title {
+          font-family: Arial, Helvetica, sans-serif;
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: #1a1a14;
+          margin: 0;
+        }
+        .svc-modal-desc {
+          font-size: 0.9rem;
+          color: #5a5a4a;
+          font-weight: 300;
+          line-height: 1.6;
+          margin: 0;
+        }
+        .svc-modal-section { display: flex; flex-direction: column; gap: 8px; }
+        .svc-modal-section-title {
+          font-size: 0.82rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          color: #2d6a4f;
+          margin: 0;
+        }
+        .svc-modal-features {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+        .svc-modal-features li {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.88rem;
+          color: #3a3a2a;
           font-weight: 300;
         }
         .svc-dot {
@@ -3273,21 +3399,26 @@ input:focus, select:focus { border-color: #1a4a2e !important; box-shadow: 0 0 0 
           background: #2d6a4f;
           flex-shrink: 0;
         }
+        .svc-modal-cta { margin-top: 6px; }
         .svc-btn {
+          display: block;
           width: 100%;
-          padding: 11px;
+          padding: 12px;
           background: #1a4a2e;
           color: #fff;
           border: none;
           border-radius: 9px;
           font-family: 'Source Sans 3', sans-serif;
-          font-size: 0.88rem;
+          font-size: 0.9rem;
           font-weight: 600;
           cursor: pointer;
           transition: opacity 0.18s;
-          margin-top: 4px;
+          text-align: center;
+          text-decoration: none;
         }
         .svc-btn:hover { opacity: 0.85; }
+
+        /* remove old unused icon rule */
 
         /* SECURITY */
         .security-section {

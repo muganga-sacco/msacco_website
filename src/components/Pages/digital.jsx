@@ -3,30 +3,107 @@ import { useState, useEffect } from "react";
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 const API_ORIGIN = API_BASE.replace(/\/api\/?$/, "");
 
-const FALLBACK_SERVICES = [
-  { title: "Mobile Banking App", description: "Access your account anywhere, anytime with our feature-rich mobile application. iOS and Android application are available.", icon_bg: "#e8f0eb", icon_color: "#2d6a4f", features: ["Balance inquiries", "Fund transfers", "Loan applications", "Transaction history"], cta_label: "Download App on Apple Store and Playstore" },
-  { title: "Internet Banking", description: "Manage your finances from your computer with our secure web portal.", icon_bg: "#e8f0eb", icon_color: "#2d6a4f", features: ["Account management", "Bill payments", "Statement downloads", "Profile updates"], cta_label: "Access Portal" },
-  { title: "Debit Card Services", description: "Convenient access to your funds with our VISA debit card.", icon_bg: "#e8f0eb", icon_color: "#2d6a4f", features: ["ATM withdrawals", "POS payments", "Online shopping", "Contactless payments"], cta_label: "Request Card" },
-  { title: "USSD Banking", description: "Check balances, Do transfers and get quick loan via USSD application on any mobile device.", icon_bg: "#e8f0eb", icon_color: "#2d6a4f", features: ["Balance Check", "Transactions between account", "MoMo transfers", "Quick loan request", "USSD access"], cta_label: "Access it through *565#" },
-  { title: "Regular Support", description: "Get help anytime through our digital support channels, call center and other channel available.", icon_bg: "#e8f0eb", icon_color: "#2d6a4f", features: ["Call center", "Email support", "Online Support", "Video tutorials"], cta_label: "Get Support" },
-];
+function resolveImg(url) {
+  if (!url) return null;
+  return url.startsWith("/") ? API_ORIGIN + url : url;
+}
 
+/* ── Service Detail Modal ─────────────────────────────────────── */
+function ServiceModal({ service: s, onClose }) {
+  // close on backdrop click
+  const handleBackdrop = e => { if (e.target === e.currentTarget) onClose(); };
+
+  // prevent body scroll while open
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
+  return (
+    <div className="svc-modal-overlay" onClick={handleBackdrop} role="dialog" aria-modal="true" aria-label={s.title}>
+      <div className="svc-modal">
+        {/* header image */}
+        {resolveImg(s.image_url) ? (
+          <img
+            src={resolveImg(s.image_url)}
+            alt={s.title}
+            className="svc-modal-img"
+          />
+        ) : (
+          <div className="svc-modal-img-placeholder" style={{ background: s.icon_bg || "#e8f0eb" }} />
+        )}
+
+        {/* close button */}
+        <button className="svc-modal-close" onClick={onClose} aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+
+        <div className="svc-modal-body">
+          <h2 className="svc-modal-title">{s.title}</h2>
+          {s.description && <p className="svc-modal-desc">{s.description}</p>}
+
+          {s.features && s.features.length > 0 && (
+            <div className="svc-modal-section">
+              <h3 className="svc-modal-section-title">Features</h3>
+              <ul className="svc-modal-features">
+                {s.features.map((f, i) => (
+                  <li key={i}><span className="svc-dot" />{f}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {s.cta_label && (
+            <div className="svc-modal-cta">
+              {s.cta_link ? (
+                <a
+                  href={s.cta_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="svc-btn"
+                >
+                  {s.cta_label}
+                </a>
+              ) : (
+                <button className="svc-btn">{s.cta_label}</button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Main Page ────────────────────────────────────────────────── */
 export default function DigitalBanking() {
   const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selected, setSelected] = useState(null);
 
   useEffect(() => {
     fetch(`${API_BASE}/digital-services`)
-      .then(r => r.json())
-      .then(res => {
-        if (res.success && res.data && res.data.length) setServices(res.data);
-        else setServices(FALLBACK_SERVICES);
+      .then(r => {
+        if (!r.ok) throw new Error(`Server error: ${r.status}`);
+        return r.json();
       })
-      .catch(() => setServices(FALLBACK_SERVICES));
+      .then(res => {
+        if (res.success && res.data) {
+          setServices(res.data);
+        } else {
+          throw new Error(res.message || "Failed to load services");
+        }
+      })
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
     <div className="db-page">
-      {/* HERO — full-width gradient wrapper */}
+      {/* HERO */}
       <div className="db-hero-wrap">
         <div className="db-hero">
           <div className="hero-left">
@@ -63,26 +140,57 @@ export default function DigitalBanking() {
       <div className="services-section">
         <h2>Our Digital Services</h2>
         <p>Experience banking without boundaries with our full range of digital solutions.</p>
+
+        {loading && (
+          <p style={{ textAlign: "center", padding: "40px 0", color: "#8aaa8a" }}>Loading services...</p>
+        )}
+        {error && (
+          <p style={{ textAlign: "center", padding: "40px 0", color: "#c0392b" }}>
+            Could not load services. Please try again later.
+          </p>
+        )}
+
         <div className="services-grid">
           {services.map((s, i) => (
             <div className="service-card" key={s.id || i}>
-              {s.image_url ? <img src={s.image_url.startsWith("/") ? API_ORIGIN + s.image_url : s.image_url} alt={s.title} style={{ width:"100%", height:180, objectFit:"cover", display:"block", borderRadius:10, marginBottom:4 }} /> : <div className="svc-icon" style={{ background: s.icon_bg || "#e8f0eb", color: s.icon_color || "#2d6a4f" }}></div>}
-              <div className="svc-title">{s.title}</div>
-              <div className="svc-desc">{s.description}</div>
-              <ul className="svc-features">
-                {(s.features || []).map((f, j) => (
-                  <li key={j}><span className="svc-dot" />{f}</li>
-                ))}
-              </ul>
-              {s.cta_label && (s.cta_link ? (
-                <a href={s.cta_link} target="_blank" rel="noopener noreferrer" className="svc-btn">{s.cta_label}</a>
-              ) : (
-                <button className="svc-btn">{s.cta_label}</button>
-              ))}
+              {/* image area */}
+              <div className="svc-card-img-wrap">
+                {resolveImg(s.image_url) ? (
+                  <img
+                    src={resolveImg(s.image_url)}
+                    alt={s.title}
+                    className="svc-card-img"
+                  />
+                ) : (
+                  <div className="svc-card-img-placeholder" style={{ background: s.icon_bg || "#e8f0eb" }}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke={s.icon_color || "#2d6a4f"} strokeWidth="1.5" width="40" height="40">
+                      <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                  </div>
+                )}
+              </div>
+
+              {/* title */}
+              <div className="svc-card-info">
+                <div className="svc-title">{s.title}</div>
+                <button
+                  className="svc-details-btn"
+                  onClick={() => setSelected(s)}
+                >
+                  More Details
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
+                    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                  </svg>
+                </button>
+              </div>
             </div>
           ))}
         </div>
       </div>
+
+      {/* Modal */}
+      {selected && <ServiceModal service={selected} onClose={() => setSelected(null)} />}
     </div>
   );
 }

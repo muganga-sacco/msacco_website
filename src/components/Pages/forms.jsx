@@ -74,9 +74,9 @@ export default function FormsPage() {
     <div style={styles.page}>
 
       <div className="forms-hero-bg" style={styles.hero}>
-        <Link to="/" style={styles.logoLink}>
+        {/* <Link to="/" style={styles.logoLink}>
           <img src={logo} alt="Muganga SACCO" style={logoStyle} />
-        </Link>
+        </Link> */}
         <h1 style={styles.heroTitle}>Download Forms</h1>
         <p style={styles.heroSubtitle}>
           Access and download all official Muganga SACCO forms
