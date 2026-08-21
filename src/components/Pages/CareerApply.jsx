@@ -46,6 +46,7 @@ export default function CareerApply() {
     id_copy: null,
     cv: null,
     academic_paper: null,
+    cover_letter: null,
     other_documents: null,
   });
 
@@ -71,7 +72,16 @@ export default function CareerApply() {
   }, [jobId]);
 
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
-  const setFile = (k) => (e) => setFiles(f => ({ ...f, [k]: e.target.files?.[0] || null }));
+  const setFile = (k, maxMB) => (e) => {
+    const file = e.target.files?.[0] || null;
+    if (file && maxMB && file.size > maxMB * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, [k]: `File must be ${maxMB} MB or smaller` }));
+      e.target.value = "";
+      return;
+    }
+    setErrors(prev => { const next = { ...prev }; delete next[k]; return next; });
+    setFiles(f => ({ ...f, [k]: file }));
+  };
 
   const validateTab = (t) => {
     const e = {};
@@ -309,6 +319,7 @@ export default function CareerApply() {
               <option value="Married">Married</option>
               <option value="Single">Single</option>
               <option value="Divorced">Divorced</option>
+              <option value="Widowed">Widowed</option>
             </select>
             {errors.marital_status && <div style={errorStyle}>{errors.marital_status}</div>}
           </div>
@@ -335,6 +346,13 @@ export default function CareerApply() {
             <input className="file-input" type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={setFile("academic_paper")} style={inputStyle} />
             {files.academic_paper && <div style={{ fontSize: "0.78rem", color: G, marginTop: 4 }}>✓ {files.academic_paper.name}</div>}
             {errors.academic_paper && <div style={errorStyle}>{errors.academic_paper}</div>}
+          </div>
+
+          <div style={groupStyle}>
+            <label style={labelStyle}>Cover Letter <span style={{ fontWeight: 400, color: "#8a8a7a", fontSize: "0.8rem" }}>(optional · max 10 MB)</span></label>
+            <input className="file-input" type="file" accept=".pdf,.doc,.docx" onChange={setFile("cover_letter", 10)} style={inputStyle} />
+            {files.cover_letter && <div style={{ fontSize: "0.78rem", color: G, marginTop: 4 }}>✓ {files.cover_letter.name}</div>}
+            {errors.cover_letter && <div style={errorStyle}>{errors.cover_letter}</div>}
           </div>
 
           <div style={groupStyle}>

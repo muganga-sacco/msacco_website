@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Search } from "lucide-react";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 const API_ORIGIN = API_BASE.replace(/\/api\/?$/, "");
@@ -20,6 +21,7 @@ export default function NewsCenter() {
   const [pubSub, setPubSub] = useState("annual_report");
   const [items, setItems] = useState([]);
   const [loaded, setLoaded] = useState(false);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -49,13 +51,36 @@ export default function NewsCenter() {
   }, []);
 
   const filtered = items.filter(i => {
-    if (activeTab === "publications") return i.section === "publications" && i.subsection === pubSub;
-    if (activeTab === "tenders") return i.section === "tender";
-    return i.section === activeTab;
+    const matchesTab =
+      activeTab === "publications"
+        ? i.section === "publications" && i.subsection === pubSub
+        : activeTab === "tenders"
+        ? i.section === "tender"
+        : i.section === activeTab;
+    const matchesQuery =
+      !query || i.title.toLowerCase().includes(query.toLowerCase());
+    return matchesTab && matchesQuery;
   });
 
   return (
-    <div className="news-center">
+    <div>
+
+      <div className="forms-hero-bg" style={heroStyles.hero}>
+        <h1 style={heroStyles.heroTitle}>Stay Informed</h1>
+        <p style={heroStyles.heroSubtitle}>Stay up to date with the latest news, announcements, publications, and tenders from Muganga SACCO.</p>
+        <div style={heroStyles.searchBar}>
+          <span style={heroStyles.searchIcon}><Search size={14} strokeWidth={2.5} /></span>
+          <input
+            type="text"
+            placeholder="Search news..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            style={heroStyles.searchInput}
+          />
+        </div>
+      </div>
+
+      <div className="news-center">
       <div className="tab-bar">
         {tabs.map((tab) => (
           <button
@@ -131,6 +156,55 @@ export default function NewsCenter() {
           )}
         </div>
       )}
+      </div>
     </div>
   );
 }
+
+const heroStyles = {
+  hero: {
+    background: "linear-gradient(135deg, #0f3d22 0%, #1a4d2e 50%, #1e5c36 100%)",
+    padding: "3rem 2rem 2.5rem",
+    textAlign: "center",
+    position: "relative",
+    overflow: "hidden",
+  },
+  heroTitle: {
+    color: "#fff",
+    fontSize: "1.9rem",
+    fontWeight: 700,
+    margin: "0 0 0.5rem",
+    fontFamily: "'Outfit', sans-serif",
+  },
+  heroSubtitle: {
+    color: "rgba(255,255,255,0.8)",
+    fontSize: "0.9rem",
+    margin: 0,
+    fontFamily: "'Outfit', sans-serif",
+  },
+  searchBar: {
+    maxWidth: 480,
+    margin: "1.5rem auto 0",
+    position: "relative",
+  },
+  searchIcon: {
+    position: "absolute",
+    left: 12,
+    top: "50%",
+    transform: "translateY(-50%)",
+    color: "rgba(255,255,255,0.7)",
+    display: "flex",
+  },
+  searchInput: {
+    width: "100%",
+    padding: "10px 16px 10px 40px",
+    borderRadius: 8,
+    border: "none",
+    fontSize: "0.85rem",
+    fontFamily: "'Outfit', sans-serif",
+    boxSizing: "border-box",
+    background: "rgba(255,255,255,0.15)",
+    color: "#fff",
+    outline: "none",
+  },
+};
