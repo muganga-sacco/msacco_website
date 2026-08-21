@@ -84,7 +84,7 @@ const REQUIREMENTS = [
 ];
 
 const LOAN_COLOR = "#1a4a2e";
-const ACCENT = "#214f66";
+const ACCENT = "#1a4a2e";
 
 
 
@@ -113,28 +113,6 @@ function Modal({ product, onClose }) {
           <h2 style={{ fontFamily:"'Playfair Display', serif", fontSize:"1.45rem", fontWeight:700, color:"#1a1a14", margin:0 }}>{product.title}</h2>
           {product.description ? <p style={{ fontSize:"0.95rem", color:"#7a7a6a", margin:"3px 0 0", fontWeight:300 }}>{product.description}</p> : null}
         </div>
-
-        <div style={{ display:"flex", gap:12, marginBottom:20 }}>
-          {product.rate > 0 ? (
-          <div style={{ flex:1, background:"#e6f2f5", borderRadius:10, padding:"12px 16px" }}>
-            <div style={{ fontSize:"0.8rem", color:"#7a7a6a", marginBottom:2, textTransform:"uppercase", letterSpacing:"0.05em" }}>Interest Rate</div>
-            <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"2rem", fontWeight:700, color:accent, lineHeight:1 }}>{product.rate}%</div>
-            <div style={{ fontSize:"0.8rem", color:"#7a7a6a" }}>{product.rateLabel === "Monthly Interest" ? "per month" : "per annum"}</div>
-          </div>
-          ) : null}
-          {product.limit ? (
-          <div style={{ flex:1, background:"#f5f5f0", borderRadius:10, padding:"12px 16px" }}>
-            <div style={{ fontSize:"0.8rem", color:"#7a7a6a", marginBottom:2, textTransform:"uppercase", letterSpacing:"0.05em" }}>Limit</div>
-            <div style={{ fontSize:"1.15rem", fontWeight:600, color:"#1a1a14", lineHeight:1.3, marginTop:4 }}>{product.limit}</div>
-            </div>
-          ) : null}
-            <div className="ms-contact-card">
-              <p className="ms-contact-heading">Need assistance?</p>
-              <p className="ms-contact-text">
-                Contact Muganga SACCO Contact Center at <strong>0788124500</strong> or email: <strong>customerservice@mugangasacco.rw</strong>
-              </p>
-            </div>
-          </div>
 
         {product.details.overview && (
         <Section title="Overview" accent={accent}>
@@ -219,6 +197,28 @@ function Modal({ product, onClose }) {
             </ul>
           </Section>
         )}
+
+        <div style={{ display:"flex", gap:12, marginBottom:20 }}>
+          {product.rate > 0 ? (
+          <div style={{ flex:1, background:"#e6f2f5", borderRadius:10, padding:"12px 16px" }}>
+            <div style={{ fontSize:"0.8rem", color:"#7a7a6a", marginBottom:2, textTransform:"uppercase", letterSpacing:"0.05em" }}>Interest Rate</div>
+            <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"2rem", fontWeight:700, color:accent, lineHeight:1 }}>{product.rate}%</div>
+            <div style={{ fontSize:"0.8rem", color:"#7a7a6a" }}>{product.rateLabel === "Monthly Interest" ? "per month" : "per annum"}</div>
+          </div>
+          ) : null}
+          {product.limit ? (
+          <div style={{ flex:1, background:"#f5f5f0", borderRadius:10, padding:"12px 16px" }}>
+            <div style={{ fontSize:"0.8rem", color:"#7a7a6a", marginBottom:2, textTransform:"uppercase", letterSpacing:"0.05em" }}>Limit</div>
+            <div style={{ fontSize:"1.15rem", fontWeight:600, color:"#1a1a14", lineHeight:1.3, marginTop:4 }}>{product.limit}</div>
+            </div>
+          ) : null}
+            <div className="ms-contact-card">
+              <p className="ms-contact-heading">Need assistance?</p>
+              <p className="ms-contact-text">
+                Contact Muganga SACCO Contact Center at <strong>0788124500</strong> or email: <strong>customerservice@mugangasacco.rw</strong>
+              </p>
+            </div>
+          </div>
 
         <button onClick={onClose} style={{ width:"100%", padding:"13px", border:"none", borderRadius:9, background:ACCENT, color:"#fff", fontFamily:"'Source Sans 3', sans-serif", fontSize:"1rem", fontWeight:600, cursor:"pointer", marginTop:8, letterSpacing:"0.3px" }}>Close</button>
       </div>
