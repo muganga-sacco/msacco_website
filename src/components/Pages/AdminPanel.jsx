@@ -1439,7 +1439,7 @@ function ManageNews({ user, onClose, onLogout }) {
 
   const fetchNews = () => {
     setLoading(true);
-    fetch(`${API_BASE}/news`)
+    fetch(`${API_BASE}/news?limit=100&page=1`)
       .then(r => r.json())
       .then(res => { if (res.success) setArticles(res.data || []); else fire("Failed to load news", "#c0392b"); })
       .catch(() => fire("Failed to load news", "#c0392b"))
