@@ -148,7 +148,7 @@ export default function About() {
               through savings, credit, digital services, and professional care.
             </p>
           </div>
-          <a className="profile-btn" href="#contact">Contact Us</a>
+          <a className="profile-btn" href="contactus">Contact Us</a>
         </div>
       </section>
     </div>
