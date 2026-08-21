@@ -316,7 +316,7 @@ export default function Products() {
       rateDisplay: api.type === "savings" && !api.interest_rate ? "Free" : undefined,
       rateTitle: api.type === "savings" && !api.interest_rate ? "Opening Fee" : undefined,
       rateLabel: api.type === "savings" && !api.interest_rate ? "Opening Fee" : rateLabelFromPeriod,
-      limit: amount || (api.type === "savings" ? "Contact us for details" : ""),
+      limit: amount || "",
       features: api.features || [],
       featured: api.is_featured || false,
       featuredLabel: api.featured_label || (api.is_featured ? "Featured" : null),
@@ -333,8 +333,8 @@ export default function Products() {
     };
   };
 
-  const loanProducts = allProducts.filter(p => p.type === "loan").map(toFrontend);
-  const savingsProducts = allProducts.filter(p => p.type === "savings" || p.type === "saving").map(toFrontend);
+  const loanProducts = allProducts.filter(p => p.type === "loan" && p.max_amount).map(toFrontend);
+  const savingsProducts = allProducts.filter(p => (p.type === "savings" || p.type === "saving") && p.max_amount).map(toFrontend);
 
   const products = isLoans ? loanProducts : savingsProducts;
   const type = isLoans ? "loan" : "savings";
