@@ -81,7 +81,6 @@ export default function HomePage(){
   const [videos, setVideos] = useState([]);
   const [featuredLoans, setFeaturedLoans] = useState([]);
   const [reports, setReports] = useState([]);
-  const [newsList, setNewsList] = useState([]);
   const [hovered, setHovered] = useState(null);
   const [slideIdx, setSlideIdx] = useState(0);
 
@@ -115,16 +114,20 @@ export default function HomePage(){
   useEffect(() => {
     fetch(`${API_BASE}/news?status=published&section=publications&subsection=annual_report&limit=50`)
       .then(r => r.json())
-      .then(res => { if (res.success) setReports(res.data?.items || res.data || []); })
+      .then(res => {
+        if (res.success) {
+          const all = res.data?.items || res.data || [];
+          // filter client-side in case the API ignores query params
+          const annualOnly = all.filter(
+            r => r.section === "publications" && r.subsection === "annual_report"
+          );
+          setReports(annualOnly);
+        }
+      })
       .catch(() => {});
   }, []);
 
-  useEffect(() => {
-    fetch(`${API_BASE}/news?status=published&limit=1`)
-      .then(r => r.json())
-      .then(res => { if (res.success) setNewsList(res.data?.items || res.data || []); })
-      .catch(() => {});
-  }, []);
+
 
   return (
     <div style={{ fontFamily: "'Segoe UI', sans-serif", color: "#1a1a1a", overflowX: "hidden" }}>
@@ -313,7 +316,7 @@ export default function HomePage(){
 
       {/* ── COMMUNITY + TRUST + VIDEOS + TWITTER ── */}
       <section style={{ background:"#f8faf8", padding:"40px 60px" }}>
-        <div style={{ display:"grid", gridTemplateColumns:"1fr auto 1fr 1fr", gap:20 }}>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr auto 1fr 1fr", gap:20, alignItems:"start", maxHeight:380, overflow:"hidden" }}>
 
           {/* Serving Rwanda */}
           <div>
@@ -341,7 +344,7 @@ export default function HomePage(){
                 <a href="#" onClick={e => { e.preventDefault(); navigate("/guides"); }} style={{ color:G, fontSize:13, fontWeight:600, textDecoration:"none", display:"flex", alignItems:"center", gap:4 }}>View all guides <ArrowRight size={14}/></a>
             </div>
             </div>
-            <div style={{ display:"flex", flexDirection:"column", gap:10, maxHeight:340, overflowY:"auto", paddingRight:4 }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:10, maxHeight:260, overflowY:"auto", paddingRight:4 }}>
               {(videos.length > 4 ? videos.slice(0, 4) : videos).map(v => (
                 <div key={v.id} onClick={() => v.video_url && window.open(v.video_url.startsWith("http") ? v.video_url : `https://${v.video_url}`, "_blank")} style={{ display:"flex", alignItems:"center", gap:12, background:"white", borderRadius:10, padding:"10px 14px", boxShadow:"0 1px 6px rgba(0,0,0,.07)", cursor:v.video_url?"pointer":"default" }}>
                   <div style={{ position:"relative", width:80, height:50, borderRadius:6, overflow:"hidden", background:"#1a1a1a", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
@@ -369,7 +372,7 @@ export default function HomePage(){
           <div>
             <h3 style={{ fontSize:22, fontWeight:800, marginBottom:2 }}>Publication</h3>
             <div style={{ fontSize:18, color:"#666", marginBottom:14 }}>Annual Reports</div>
-            <div style={{ display:"flex", flexDirection:"column", gap:12, maxHeight:420, overflowY:"auto", paddingRight:4 }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:12, maxHeight:280, overflowY:"auto", paddingRight:4 }}>
               {(() => {
                 if (!reports.length) return <p style={{ color:"#888", fontSize:12, textAlign:"center", padding:"10px 0" }}>No reports available</p>;
                 const grouped = {};
