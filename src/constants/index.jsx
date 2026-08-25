@@ -56,7 +56,6 @@ export const SAVINGS_BREAKDOWN = [
 
 export const FOOTER_QUICK_LINKS = [
   {text :"Products", href:"/products"}, 
-  {text:"Loan Products", href:"/products"},
   {text:"Board Members", href:"/board"},
   {text:"Careers", href:"/careers"},
   {text: "News/Tenders", href:"/news"}, 
@@ -64,8 +63,8 @@ export const FOOTER_QUICK_LINKS = [
 
 export const FOOTER_SERVICES    = [
   {text: "Digital Services", href:"/digital"},
-  {text: "Market Trends" , href:"#"}, 
   {text: "Internet Banking" , href:"https://ibank.mugangasacco.rw/"}, 
+  { text: "Support Platform", href: "https://support.mugangasacco.rw/"},
   {text:"Video Guides", href:"/guides"},
   {text: "Help" , href:"/contactus"}
 ];
@@ -80,9 +79,8 @@ export const CONTACT_INFO = [
 export const IMPORTANT_INFO = [
   { text: "Consumer Empowerment", href : "/ConsumerEmpowerment" },
   { text: "Report Fraud/Corruption", href: "/reportfraud"},
-  { text: "Support Platform", href: "https://support.mugangasacco.rw/"},
   { text: "Terms and Condition", href : "/terms" },
   { text: "Tariff", href : "/tariff"},
   { text: "Suggestion Box", href:"/suggestion"},
-  { text: "Customer service charter", href:"/MUGANGA-SACCO-CUSTOMER-SERVICE-CHARTER-FROM-2024-Approved-Published.pdf" },
+  { text: "Customer service charter", href:"https://mugangasacco.rw/wp-content/uploads/2024/08/MUGANGA-SACCO-CUSTOMER-SERVICE-CHARTER-FROM-2024-Approved-Published.pdf" },
 ];
