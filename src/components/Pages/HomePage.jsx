@@ -136,10 +136,10 @@ export default function HomePage(){
       <section style={{ display:"grid", gridTemplateColumns:"1fr 1fr", minHeight:460, background:"white", overflow:"hidden" }}>
         {/* Left */}
         <div style={{ padding:"60px 40px 60px 60px", display:"flex", flexDirection:"column", justifyContent:"center" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:18 }}>
+          {/* <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:18 }}>
             <CheckCircle2 size={18} color={G}/>
             <span style={{ fontSize:13, color:"#555" }}>Trusted by 10,000+ members</span>
-          </div>
+          </div> */}
           <h1 style={{ fontSize:42, fontWeight:800, lineHeight:1.2, margin:"0 0 12px" }}>
             Empowering Healthcare<br/>Professionals to<br/>
             <span style={{ color:G }}>Dream </span>

@@ -143,7 +143,7 @@ export default function CareerApply() {
     return (
       <div style={{ maxWidth: 520, margin: "80px auto", textAlign: "center", fontFamily: "'Source Sans 3', sans-serif", padding: "0 20px" }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>✓</div>
-        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", color: "#1a1a14", marginBottom: 8 }}>Application Submitted</h2>
+        <h2 style={{ fontFamily: "Arial, sans-serif", fontSize: "1.6rem", color: "#1a1a14", marginBottom: 8 }}>Application Submitted</h2>
         <p style={{ color: "#7a7a6a", lineHeight: 1.6, marginBottom: 24 }}>Thank you for applying. We will review your application and contact you if you are shortlisted.</p>
         <Link to="/careers" style={{ color: "#1a4a2e", fontWeight: 600 }}>Browse more jobs →</Link>
       </div>
@@ -171,7 +171,7 @@ export default function CareerApply() {
         ← Back to careers
       </Link>
 
-      <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.7rem", color: "#1a1a14", marginBottom: 4 }}>
+      <h1 style={{ fontFamily: "Arial, sans-serif", fontSize: "1.7rem", color: "#1a1a14", marginBottom: 4 }}>
         Apply for {job ? job.title : "this position"}
       </h1>
       {job && (
@@ -365,7 +365,7 @@ export default function CareerApply() {
 
         {/* ──── Tab 2: References ──── */}
         {tab === 2 && <>
-          <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", color: "#1a1a14", marginBottom: 14 }}>References (3 required)</h3>
+          <h3 style={{ fontFamily: "Arial, sans-serif", fontSize: "1rem", color: "#1a1a14", marginBottom: 14 }}>References (3 required)</h3>
           {[1, 2, 3].map((n) => (
             <div key={n} style={{ background: "#fff", borderRadius: 10, border: "1px solid #e4e0d8", padding: "16px 18px", marginBottom: 12 }}>
               <div style={{ fontSize: "0.82rem", fontWeight: 600, color: G, marginBottom: 10 }}>Reference {n}</div>

@@ -69,7 +69,7 @@ export default function Footer() {
           {/* Brand */}
           <div style={{color:"#000", textAlign: "center"}}>
             <div style={{ marginBottom: 16 }}>
-              <img src="/mugangaSaccoLogo.jpg" alt="Muganga SACCO" style={{ height: 36, width: "auto" }} />
+              <img src="/mugangaSaccoLogo.jpg" alt="Muganga SACCO" style={{ height: 40, width: "auto" }} />
             </div>
             <p style={{ fontSize: "0.86rem", lineHeight: 1.75, maxWidth: 280, margin: "0 auto 16px" }}>
               Empowering health sector professionals with trusted microfinance solutions.
