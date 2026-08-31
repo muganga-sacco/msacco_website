@@ -71,7 +71,7 @@ export default function Footer() {
             <div style={{ marginBottom: 16 }}>
               <img src="/mugangaSaccoLogo.jpg" alt="Muganga SACCO" style={{ height: 60, width: "auto" }} />
             </div>
-            <p style={{ fontSize: "0.86rem", lineHeight: 1.75, maxWidth: 280, margin: "0 auto 16px" }}>
+            <p style={{ fontSize: "0.86rem", lineHeight: 1.75, maxWidth: 270, margin: "0 auto 16px" }}>
               Empowering health sector professionals with trusted microfinance solutions.
             </p>
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
