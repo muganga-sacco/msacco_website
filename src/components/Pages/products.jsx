@@ -143,7 +143,7 @@ function Modal({ product, type, onClose }) {
         {/* Header */}
         <div style={{ marginBottom: 20 }}>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.45rem", fontWeight: 700, color: "#1a1a14", margin: 0 }}>{product.title}</h2>
-          {product.description ? <p style={{ fontSize: "0.95rem", color: "#7a7a6a", margin: "3px 0 0", fontWeight: 300 }}>{product.description}</p> : null}
+          {/* {product.description ? <p style={{ fontSize: "0.95rem", color: "#7a7a6a", margin: "3px 0 0", fontWeight: 300 }}>{product.description}</p> : null} */}
         </div>
 
         {/* Rate + Limit */}
@@ -244,7 +244,7 @@ function Modal({ product, type, onClose }) {
 
         {/* Required Forms */}
         {product.details.required_forms?.length > 0 && (
-          <Section title="Required Forms" accent={accent}>
+          <Section title="Requirements" accent={accent}>
             <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
               {product.details.required_forms.map((item, i) => (
                 <li key={i} style={{ display: "flex", gap: 8, fontSize: "0.92rem", color: "#4a4a3a", padding: "3px 0", fontWeight: 300 }}>

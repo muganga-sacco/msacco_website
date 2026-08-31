@@ -39,6 +39,7 @@ const SAVINGS = [
   { title: "Voluntary Savings",  sub: "Save regularly at your own pace" },
   { title: "Term deposit",      sub: "Saving for a period of time and get your saving with interest" },
   { title: "Compursory Savings",     sub: "Save 5% of your salary for your better future." },
+  { title: "Zigama Savings",     sub: "Save towards your goals with a structured savings plan." },
 ];
 
 // ── Digital services ──────────────────────────────────────────

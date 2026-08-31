@@ -102,7 +102,7 @@ const CONTACT_INFO = [
 
 const HOURS = [
   { day: "Monday – Friday", time: "8:00 AM – 5:00 PM", closed: false },
-  { day: "Saturday",        time: "9:00 AM – 1:00 PM", closed: false },
+  { day: "Saturday",        time: "Closed",             closed: true },
   { day: "Sunday",          time: "Closed",             closed: true  },
   { day: "Public Holidays", time: "Closed",             closed: true  },
 ];
