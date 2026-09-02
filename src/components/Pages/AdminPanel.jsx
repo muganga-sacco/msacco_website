@@ -58,14 +58,14 @@ function apiHeaders() {
 function toApiProduct(fp) {
   const typeMap = { loan: "loan", savings: "savings" };
   const rawRate = String(fp.rate || "").replace(/%/g, "").trim();
-  const rawAmt  = String(fp.amount || "").replace(/[^0-9]/g, "").trim();
   return {
     type: typeMap[fp.type?.toLowerCase()] || fp.type?.toLowerCase() || "loan",
     title: fp.name || "",
     description: fp.desc || "",
     interest_rate: rawRate ? parseFloat(rawRate) || 0 : 0,
     interest_period: fp.interestPeriod || "yearly",
-    max_amount: rawAmt ? parseInt(rawAmt, 10) || null : null,
+    min_amount: String(fp.minAmount || "").trim() || "",
+    max_amount: String(fp.maxAmount || "").trim() || "",
     features: Array.isArray(fp.features) ? fp.features.filter(f => String(f || "").trim()) : [],
     is_featured: !!fp.featured,
     eligibility: Array.isArray(fp.eligibility) ? fp.eligibility.filter(f => String(f || "").trim()) : [],
@@ -79,10 +79,6 @@ function toApiProduct(fp) {
 }
 
 function toFrontendProduct(api) {
-  let amount = "";
-  if (api.max_amount) {
-    amount = `Up to RWF ${Number(api.max_amount).toLocaleString()}`;
-  }
   return {
     id: api.id,
     type: api.type === "loan" ? "Loan" : "Savings",
@@ -90,7 +86,8 @@ function toFrontendProduct(api) {
     desc: api.description || "",
     rate: `${api.interest_rate}%`,
     interestPeriod: api.interest_period || "yearly",
-    amount,
+    minAmount: api.min_amount || "",
+    maxAmount: api.max_amount || "",
     features: api.features || [],
     featured: api.is_featured || false,
     eligibility: api.eligibility || [],
@@ -357,7 +354,7 @@ function ProductModal({ initial, onClose, onSave }) {
   const [fire, Toast] = useToast();
   const isEdit = !!initial;
   const defaultForm = {
-    type: "Loan", name: "", desc: "", rate: "", amount: "",
+    type: "Loan", name: "", desc: "", rate: "", minAmount: "", maxAmount: "",
     interestPeriod: "yearly",
     features: ["", "", ""], featured: false,
     eligibility: ["", "", ""], requiredDocuments: ["", "", ""], applicationProcess: "",
@@ -431,7 +428,8 @@ function ProductModal({ initial, onClose, onSave }) {
         <div className="form-group"><label className="form-label">Description</label><textarea className="form-textarea" placeholder="Brief description of the product" value={form.desc} onChange={e => updateField("desc", e.target.value)} /></div>
         <div className="form-row">
           <div className="form-group"><label className="form-label">Interest Rate</label><input className="form-input" placeholder="e.g., 12" value={form.rate} onChange={e => updateField("rate", e.target.value)} /></div>
-          <div className="form-group"><label className="form-label">Max Amount</label><input className="form-input" placeholder="e.g., Up to RWF 50M" value={form.amount} onChange={e => updateField("amount", e.target.value)} /></div>
+          <div className="form-group"><label className="form-label">Min Amount</label><input className="form-input" placeholder="e.g., 50,000 RWF" value={form.minAmount} onChange={e => updateField("minAmount", e.target.value)} /></div>
+          <div className="form-group"><label className="form-label">Max Amount</label><input className="form-input" placeholder="e.g., 500,000 RWF" value={form.maxAmount} onChange={e => updateField("maxAmount", e.target.value)} /></div>
         </div>
         <div className="form-group"><label className="form-label">Interest Period</label><select className="form-select" value={form.interestPeriod} onChange={e => updateField("interestPeriod", e.target.value)}><option value="yearly">Yearly (per annum)</option><option value="monthly">Monthly</option></select></div>
         <div className="form-group"><label className="form-label">Features</label>
@@ -572,7 +570,7 @@ function ManageProducts({ user, onBack, onLogout }) {
                   {p.imageUrl ? <img src={p.imageUrl.startsWith("/") ? API_ORIGIN + p.imageUrl : p.imageUrl} alt="" style={{ width:36, height:36, borderRadius:8, objectFit:"cover" }} onError={(e) => { e.target.style.display="none"; }} /> : <span className="card-icon-muted"><BoxIcon size={18} /></span>}
                 </div>
                 <div className="product-name">{p.name}</div><div className="product-desc">{p.desc}</div>
-                <div className="product-rate">{p.rate}</div><div className="product-amount">{p.amount}</div>
+                <div className="product-rate">{p.rate}</div><div className="product-amount">{[p.minAmount, p.maxAmount].filter(Boolean).join(" – ")}</div>
                 <div className="card-actions"><button className="edit-btn" onClick={() => setEditing(p)}><EditIcon /> Edit</button><button className="delete-btn" onClick={() => setDeleting(p)}><TrashIcon /> Delete</button></div>
               </div>
             ))}
