@@ -1414,9 +1414,9 @@ function ManageCareers({ user, onBack, onLogout }) {
 // ══════════════════════════════════════════════════════════════════════════
 function NewsFormModal({ initial, onClose, onSave }) {
   const isEdit = !!initial;
-  const [form, setForm] = useState(initial ? { ...initial } : {
+  const [form, setForm] = useState(initial ? { ...initial, sort_order: initial.sort_order ?? 0 } : {
     title: "", excerpt: "", content: "", tag: "", image_url: "", file_url: "",
-    is_featured: false, status: "draft", section: "news", subsection: ""
+    is_featured: false, status: "draft", section: "news", subsection: "", sort_order: 0
   });
   const [uploading, setUploading] = useState(false);
   const [fire, Toast] = useToast();
@@ -1480,6 +1480,7 @@ function NewsFormModal({ initial, onClose, onSave }) {
             </select>
           </div>
         </div>
+        <div className="form-group"><label className="form-label">Sort Order (lower numbers appear first, 0 = default)</label><input className="form-input" type="number" min="0" placeholder="0" value={form.sort_order ?? 0} onChange={e => set("sort_order", parseInt(e.target.value) || 0)} /></div>
         <div className="form-row">
           <div className="form-group">
             <label className="form-label">Attach File (PDF, DOC, etc.)</label>
@@ -1577,7 +1578,7 @@ function ManageNews({ user, onClose, onLogout }) {
                     <span className={`badge ${a.status === "published" ? "badge-featured" : a.status === "archived" ? "" : "badge-savings"}`} style={{ fontSize: 10.5, padding: "2px 7px", textTransform: "capitalize" }}>{a.status}</span>
                     {a.is_featured && <span className="badge badge-featured" style={{ fontSize: 10.5, padding: "2px 7px" }}>Featured</span>}
                   </div>
-                  <div style={{ fontSize: 12.5, color: "#8aaa8a" }}>{a.tag && <span>{a.tag} · </span>}{fmtDate(a.published_at || a.created_at)}</div>
+                  <div style={{ fontSize: 12.5, color: "#8aaa8a" }}>{a.tag && <span>{a.tag} · </span>}{fmtDate(a.published_at || a.created_at)}{a.sort_order > 0 && <span style={{ marginLeft: 6, fontWeight: 700, color: "#166534" }}>· Sort: {a.sort_order}</span>}</div>
                 </div>
                 <div className="card-actions">
                   <button className="edit-btn" onClick={() => setEditing(a)}><EditIcon /> Edit</button>
