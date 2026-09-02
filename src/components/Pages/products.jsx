@@ -305,7 +305,9 @@ export default function Products() {
 
   const toFrontend = (api) => {
     const d = DETAILS_BY_TITLE[api.title] || {};
-    const amount = api.max_amount ? `Up to RWF ${Number(api.max_amount).toLocaleString()}` : "";
+    const minAmt = String(api.min_amount || "").trim();
+    const maxAmt = String(api.max_amount || "").trim();
+    const amount = [minAmt, maxAmt].filter(Boolean).join(" – ");
     const rateLabelFromPeriod = api.interest_period === "monthly" ? "per month" : "per annum";
     return {
       id: api.id,
