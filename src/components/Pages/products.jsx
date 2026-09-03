@@ -60,12 +60,12 @@ const DETAILS_BY_TITLE = {
     documents: ["KYC (Know your customer Document completed)"],
     process: "Reach out to Muganga Sacco Main branch, Head Quorter or Nearby CRO (Customer Relationship Officer)",
   },
-  "Current Account": {
-    overview: "Individual Account opening helps health sector professionals become Muganga SACCO members and access savings, loans, and other member services through a personal account.",
-    eligibility: ["Health sector professional or eligible SACCO member", "Must be 18 years or older", "Valid identification document"],
-    documents: ["National ID / Passport", "Passport photo", "Proof of employment or professional affiliation"],
-    process: "Start online or visit any branch with the required documents. Account activation is completed after verification.",
-  },
+  // "Current Account": {
+  //   overview: "Individual Account opening helps health sector professionals become Muganga SACCO members and access savings, loans, and other member services through a personal account.",
+  //   eligibility: ["Health sector professional or eligible SACCO member", "Must be 18 years or older", "Valid identification document"],
+  //   documents: ["National ID / Passport", "Passport photo", "Proof of employment or professional affiliation"],
+  //   process: "Start online or visit any branch with the required documents. Account activation is completed after verification.",
+  // },
   "Group or Institution Account": {
     overview: "Group or Institution Accounts support associations, clinics, departments, and other organized groups that need a shared SACCO account with authorized signatories.",
     eligibility: ["Registered group, association, clinic, or institution", "Approved representatives or signatories", "Valid registration or authorization documents"],
@@ -148,10 +148,10 @@ function Modal({ product, type, onClose }) {
 
         {/* Rate + Limit */}
         <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
-          {product.rateDisplay || (product.rate > 0 && product.rate !== "") ? (
+          {product.rateDisplay || (product.rate && product.rate !== "") ? (
           <div style={{ flex: 1, background: bg, borderRadius: 10, padding: "12px 16px" }}>
             <div style={{ fontSize: "0.8rem", color: "#7a7a6a", marginBottom: 2, textTransform: "uppercase", letterSpacing: "0.05em" }}>{product.rateTitle || "Interest Rate"}</div>
-            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "2rem", fontWeight: 700, color: accent, lineHeight: 1 }}>{product.rateDisplay || `${product.rate}%`}</div>
+            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "2rem", fontWeight: 700, color: accent, lineHeight: 1 }}>{product.rateDisplay || product.rate}</div>
             <div style={{ fontSize: "0.8rem", color: "#7a7a6a" }}>{product.rateLabel || "per annum"}</div>
           </div>
           ) : null}
@@ -209,13 +209,6 @@ function Modal({ product, type, onClose }) {
         </Section>
         )}
 
-        {/* Process */}
-        {product.details.process && (
-        <Section title="Application Process" accent={accent}>
-          <p style={{ fontSize: "0.95rem", color: "#4a4a3a", lineHeight: 1.7, margin: 0, fontWeight: 300 }}>{product.details.process}</p>
-        </Section>
-        )}
-
         {/* Targeted Customers */}
         {product.details.targeted_customers?.length > 0 && (
           <Section title="Targeted Customers" accent={accent}>
@@ -240,6 +233,13 @@ function Modal({ product, type, onClose }) {
               ))}
             </ul>
           </Section>
+        )}
+
+        {/* Process */}
+        {product.details.process && (
+        <Section title="Application Process" accent={accent}>
+          <p style={{ fontSize: "0.95rem", color: "#4a4a3a", lineHeight: 1.7, margin: 0, fontWeight: 300 }}>{product.details.process}</p>
+        </Section>
         )}
 
         {/* Required Forms */}
@@ -314,7 +314,7 @@ export default function Products() {
       imageUrl: api.image_url || "",
       title: api.title,
       description: api.description || "",
-      rate: api.interest_rate ? parseFloat(api.interest_rate) : "",
+      rate: api.interest_rate ? String(api.interest_rate) : "",
       rateDisplay: api.type === "savings" && !api.interest_rate ? "Free" : undefined,
       rateTitle: api.type === "savings" && !api.interest_rate ? "Opening Fee" : undefined,
       rateLabel: api.type === "savings" && !api.interest_rate ? "Opening Fee" : rateLabelFromPeriod,
@@ -373,7 +373,7 @@ export default function Products() {
                 {p.featuredLabel && <div className={`featured-badge ${type}`}>{p.featuredLabel}</div>}
                 {p.imageUrl ? <img src={p.imageUrl.startsWith("/") ? API_ORIGIN + p.imageUrl : p.imageUrl} alt={p.title} style={{ width:"100%", height:180, objectFit:"cover", display:"block", borderRadius:12, marginTop: p.featuredLabel ? 36 : 0 }} /> : null}
                 <div className="card-title">{p.title}</div>
-                {p.rateDisplay || p.rate > 0 ? (
+                {p.rateDisplay || p.rate ? (
                 <div className="rate-row">
                   {/* <span className={`rate-num ${type}`}>{p.rateDisplay || `${p.rate}%`}</span> */}
                   {/* <span className="rate-label">{p.rateLabel || "Annual Interest"}</span> */}
