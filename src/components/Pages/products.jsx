@@ -148,10 +148,10 @@ function Modal({ product, type, onClose }) {
 
         {/* Rate + Limit */}
         <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
-          {product.rateDisplay || (product.rate && product.rate !== "") ? (
+          {product.rate ? (
           <div style={{ flex: 1, background: bg, borderRadius: 10, padding: "12px 16px" }}>
-            <div style={{ fontSize: "0.8rem", color: "#7a7a6a", marginBottom: 2, textTransform: "uppercase", letterSpacing: "0.05em" }}>{product.rateTitle || "Interest Rate"}</div>
-            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "2rem", fontWeight: 700, color: accent, lineHeight: 1 }}>{product.rateDisplay || product.rate}</div>
+            <div style={{ fontSize: "0.8rem", color: "#7a7a6a", marginBottom: 2, textTransform: "uppercase", letterSpacing: "0.05em" }}>Interest Rate</div>
+            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "2rem", fontWeight: 700, color: accent, lineHeight: 1 }}>{product.rate}</div>
             <div style={{ fontSize: "0.8rem", color: "#7a7a6a" }}>{product.rateLabel || "per annum"}</div>
           </div>
           ) : null}
@@ -314,10 +314,8 @@ export default function Products() {
       imageUrl: api.image_url || "",
       title: api.title,
       description: api.description || "",
-      rate: api.interest_rate ? String(api.interest_rate) : "",
-      rateDisplay: api.type === "savings" && !api.interest_rate ? "Free" : undefined,
-      rateTitle: api.type === "savings" && !api.interest_rate ? "Opening Fee" : undefined,
-      rateLabel: api.type === "savings" && !api.interest_rate ? "Opening Fee" : rateLabelFromPeriod,
+      rate: api.interest_rate && Number(api.interest_rate) !== 0 ? String(api.interest_rate) : "",
+      rateLabel: rateLabelFromPeriod,
       limit: amount || "",
       features: api.features || [],
       featured: api.is_featured || false,
@@ -373,11 +371,11 @@ export default function Products() {
                 {p.featuredLabel && <div className={`featured-badge ${type}`}>{p.featuredLabel}</div>}
                 {p.imageUrl ? <img src={p.imageUrl.startsWith("/") ? API_ORIGIN + p.imageUrl : p.imageUrl} alt={p.title} style={{ width:"100%", height:180, objectFit:"cover", display:"block", borderRadius:12, marginTop: p.featuredLabel ? 36 : 0 }} /> : null}
                 <div className="card-title">{p.title}</div>
-                {p.rateDisplay || p.rate ? (
-                <div className="rate-row">
-                  {/* <span className={`rate-num ${type}`}>{p.rateDisplay || `${p.rate}%`}</span> */}
-                  {/* <span className="rate-label">{p.rateLabel || "Annual Interest"}</span> */}
-                </div>
+                {p.rate ? (
+                  <div className="rate-row">
+                    <span className={`rate-num ${type}`}>{p.rate}</span>
+                    <span className="rate-label">{p.rateLabel || "Annual Interest"}</span>
+                  </div>
                 ) : null}
                 <button className={`cta-btn ${type}`} onClick={() => setSelectedProduct(p)}>{p.cta}</button>
               </div>
