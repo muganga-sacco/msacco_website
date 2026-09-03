@@ -57,12 +57,11 @@ function apiHeaders() {
 
 function toApiProduct(fp) {
   const typeMap = { loan: "loan", savings: "savings" };
-  const rawRate = String(fp.rate || "").replace(/%/g, "").trim();
   return {
     type: typeMap[fp.type?.toLowerCase()] || fp.type?.toLowerCase() || "loan",
     title: fp.name || "",
     description: fp.desc || "",
-    interest_rate: rawRate ? parseFloat(rawRate) || 0 : 0,
+    interest_rate: String(fp.rate || "").trim(),
     interest_period: fp.interestPeriod || "yearly",
     min_amount: String(fp.minAmount || "").trim() || "",
     max_amount: String(fp.maxAmount || "").trim() || "",
@@ -84,7 +83,7 @@ function toFrontendProduct(api) {
     type: api.type === "loan" ? "Loan" : "Savings",
     name: api.title,
     desc: api.description || "",
-    rate: `${api.interest_rate}%`,
+    rate: String(api.interest_rate || ""),
     interestPeriod: api.interest_period || "yearly",
     minAmount: api.min_amount || "",
     maxAmount: api.max_amount || "",
@@ -427,7 +426,7 @@ function ProductModal({ initial, onClose, onSave }) {
         <div className="form-group"><label className="form-label">Product Name</label><input className="form-input" placeholder="e.g., Business Loans" value={form.name} onChange={e => updateField("name", e.target.value)} /></div>
         <div className="form-group"><label className="form-label">Description</label><textarea className="form-textarea" placeholder="Brief description of the product" value={form.desc} onChange={e => updateField("desc", e.target.value)} /></div>
         <div className="form-row">
-          <div className="form-group"><label className="form-label">Interest Rate</label><input className="form-input" placeholder="e.g., 12" value={form.rate} onChange={e => updateField("rate", e.target.value)} /></div>
+          <div className="form-group"><label className="form-label">Interest Rate</label><input className="form-input" placeholder="e.g., 12%, 8 - 12%, Negotiable" value={form.rate} onChange={e => updateField("rate", e.target.value)} /></div>
           <div className="form-group"><label className="form-label">Min Amount</label><input className="form-input" placeholder="e.g., 50,000 RWF" value={form.minAmount} onChange={e => updateField("minAmount", e.target.value)} /></div>
           <div className="form-group"><label className="form-label">Max Amount</label><input className="form-input" placeholder="e.g., 500,000 RWF" value={form.maxAmount} onChange={e => updateField("maxAmount", e.target.value)} /></div>
         </div>
@@ -703,7 +702,7 @@ function ManageServices({ user, onBack, onLogout }) {
       id: s.id,
       title: s.title,
       description: s.description || "",
-      rate: `${s.interest_rate}%`,
+      rate: String(s.interest_rate || ""),
       amount: s.max_amount ? `Up to RWF ${Number(s.max_amount).toLocaleString()}` : "",
       featured: s.is_featured || false,
       imageUrl: s.image_url || "",
@@ -718,12 +717,11 @@ function ManageServices({ user, onBack, onLogout }) {
   }
 
   function toApi(fp) {
-    const rawRate = String(fp.interest_rate || "").replace(/%/g, "").trim();
     const rawAmt  = String(fp.max_amount || "").replace(/[^0-9]/g, "").trim();
     return {
       title: fp.title || "",
       description: fp.description || "",
-      interest_rate: rawRate ? parseFloat(rawRate) || 0 : 0,
+      interest_rate: String(fp.interest_rate || "").trim(),
       max_amount: rawAmt ? parseInt(rawAmt, 10) || null : null,
       features: Array.isArray(fp.features) ? fp.features.filter(f => String(f || "").trim()) : [],
       eligibility: Array.isArray(fp.eligibility) ? fp.eligibility.filter(f => String(f || "").trim()) : [],
@@ -2065,7 +2063,7 @@ function ManageSettings({ user, onClose, onLogout }) {
                     <svg viewBox="0 0 24 24" fill="none" stroke={isFav?"white":"#8aaa8a"} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" width="18" height="18"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" /></svg>
                   </div>
                   <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontSize:13.5,color:"#0d1f0d"}}><strong>{p.title}</strong><span style={{color:"#c8dcc8",margin:"0 8px"}}>|</span>{p.type==="loan"?"Loan":"Savings"}<span style={{marginLeft:8,fontSize:11,opacity:.6}}>{p.interest_rate}%</span></div>
+                    <div style={{fontSize:13.5,color:"#0d1f0d"}}><strong>{p.title}</strong><span style={{color:"#c8dcc8",margin:"0 8px"}}>|</span>{p.type==="loan"?"Loan":"Savings"}{p.interest_rate ? <span style={{marginLeft:8,fontSize:11,opacity:.6}}>{p.interest_rate}</span> : null}</div>
                     {isFav && p.featured_label && <div style={{fontSize:11,color:"#1a5c2a",marginTop:2}}>Label: {p.featured_label}</div>}
                   </div>
                   <button onClick={()=>toggleFeatured(p)} style={{background:isFav?"#1a5c2a":"white",color:isFav?"white":"#1a5c2a",border:`1.5px solid ${isFav?"#1a5c2a":"#e4ede4"}`,borderRadius:6,padding:"6px 14px",fontSize:12,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}}>
