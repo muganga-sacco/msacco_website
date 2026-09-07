@@ -74,8 +74,8 @@ export default function Navbar() {
 
   const langOptions = [
     { code: "en", label: "English", flag: UKFlag },
-    { code: "fr", label: "Français", flag: FRFlag },
-    { code: "rw", label: "Kinyarwanda", flag: RWFlag },
+    // { code: "fr", label: "Français", flag: FRFlag },
+    // { code: "rw", label: "Kinyarwanda", flag: RWFlag },
   ];
   const CurrentFlag = langOptions.find((o) => o.code === currentLang).flag;
 
