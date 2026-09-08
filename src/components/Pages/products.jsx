@@ -371,12 +371,12 @@ export default function Products() {
                 {p.featuredLabel && <div className={`featured-badge ${type}`}>{p.featuredLabel}</div>}
                 {p.imageUrl ? <img src={p.imageUrl.startsWith("/") ? API_ORIGIN + p.imageUrl : p.imageUrl} alt={p.title} style={{ width:"100%", height:180, objectFit:"cover", display:"block", borderRadius:12, marginTop: p.featuredLabel ? 36 : 0 }} /> : null}
                 <div className="card-title">{p.title}</div>
-                {p.rate ? (
+                {/* {p.rate ? (
                   <div className="rate-row">
                     <span className={`rate-num ${type}`}>{p.rate}</span>
                     <span className="rate-label">{p.rateLabel || "Annual Interest"}</span>
                   </div>
-                ) : null}
+                ) : null} */}
                 <button className={`cta-btn ${type}`} onClick={() => setSelectedProduct(p)}>{p.cta}</button>
               </div>
             );
