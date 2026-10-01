@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+const API_ORIGIN = API_BASE.replace(/\/api\/?$/, "");
 
 const PRINCIPLE_COLORS = [
   { color: "#2d6a4f", bg: "#e8f0eb" },
@@ -41,10 +42,10 @@ function PersonCard({ person, imageHeight = 200 }) {
   const [imgErr, setImgErr] = useState(false);
   return (
     <div className="person-card">
-      <div className="card-photo" style={{ height: imageHeight }}>
-        {(person.image || person.image_url) && !imgErr ? (
+      <div className="card-photo" style={{ height: imageHeight, overflow: "hidden" }}>
+        {person.image && !imgErr ? (
           <img
-            src={person.image || person.image_url}
+            src={person.image}
             alt={person.name}
             onError={() => setImgErr(true)}
             style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }}
@@ -66,7 +67,10 @@ function PersonCard({ person, imageHeight = 200 }) {
 
 /* ─── MAIN PAGE ─────────────────────────────────────── */
 function mapMember(m) {
-  return { id: m.id, name: m.name, role: m.role, roleColor: toRoleColor(m.role), bio: m.bio || "", image: m.image_url || "" };
+  const imageUrl = m.image_url
+    ? (m.image_url.startsWith("/") ? API_ORIGIN + m.image_url : m.image_url)
+    : "";
+  return { id: m.id, name: m.name, role: m.role, roleColor: toRoleColor(m.role), bio: m.bio || "", image: imageUrl };
 }
 
 export default function board() {
@@ -79,20 +83,20 @@ export default function board() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [boardRes, superRes, mgmtRes, prinRes] = await Promise.all([
-          fetch(`${API_BASE}/board/members?type=board_of_directors&is_active=true`),
-          fetch(`${API_BASE}/board/members?type=supervisory_board&is_active=true`),
-          fetch(`${API_BASE}/board/members?type=management_team&is_active=true`),
+        // Fetch all members in one request, then split by type on the client
+        const [membersRes, prinRes] = await Promise.all([
+          fetch(`${API_BASE}/board/members`),
           fetch(`${API_BASE}/board/principles`),
         ]);
-        const boardData = await boardRes.json();
-        const superData = await superRes.json();
-        const mgmtData = await mgmtRes.json();
+        const membersData = await membersRes.json();
         const prinData = await prinRes.json();
 
-        if (boardData.success) setBoardMembers((boardData.data || []).map(mapMember));
-        if (superData.success) setSupervisoryBoard((superData.data || []).map(mapMember));
-        if (mgmtData.success) setManagementTeam((mgmtData.data || []).map(mapMember));
+        if (membersData.success) {
+          const all = (membersData.data || []).filter((m) => m.is_active !== false);
+          setBoardMembers(all.filter((m) => m.board_type === "board_of_directors").map(mapMember));
+          setSupervisoryBoard(all.filter((m) => m.board_type === "supervisory_board").map(mapMember));
+          setManagementTeam(all.filter((m) => m.board_type === "management_team").map(mapMember));
+        }
         if (prinData.success) {
           setPrinciples(
             (prinData.data || []).map((p, i) => ({
