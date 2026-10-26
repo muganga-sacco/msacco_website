@@ -119,7 +119,10 @@ export default function Footer() {
         {/* Bottom bar */}
         <div style={{ paddingTop: 24, display: "flex", color:"#000", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
           <p style={{ fontSize: "0.8rem", color: "#000" }}>© 2026 Muganga SACCO. All rights reserved.</p>
-          <p style={{ fontSize: "0.8rem", color: "#000" }}>Muganga SACCO is regulated by the National Bank of Rwanda</p>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+            <p style={{ fontSize: "0.8rem", color: "#000" }}>Muganga SACCO is regulated by the National Bank of Rwanda</p>
+            <Link to="/policy" style={{ fontSize: "0.8rem", color: "#000", textDecoration: "none" }}>Privacy Policy</Link>
+          </div>
         </div>
       </div>
     </footer>
