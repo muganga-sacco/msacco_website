@@ -83,4 +83,5 @@ export const IMPORTANT_INFO = [
   { text: "Tariff", href : "/tariff"},
   { text: "Suggestion Box", href:"/suggestion"},
   { text: "Customer service charter", href:"https://mugangasacco.rw/wp-content/uploads/2024/08/MUGANGA-SACCO-CUSTOMER-SERVICE-CHARTER-FROM-2024-Approved-Published.pdf" },
+  { text: "Privacy Policy", href: "/policy" },
 ];
