@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { NAV_LINKS } from "../../constants";
 import { useScrolled } from "../../hooks/useScrolled";
 import { Link, useNavigate } from "react-router-dom";
+import { captureEvent } from "../../lib/posthog.js";
 
 const UKFlag = () => (
   <svg viewBox="0 0 60 30" width="20" height="13">
@@ -198,7 +199,12 @@ export default function Navbar() {
             )}
           </div>
           <div id="google_translate_element" style={{ display: "none" }} />
-          <a href="https://ibank.mugangasacco.rw/" className="btn-outline-green" style={{ padding: "7px 16px", fontSize: "0.8rem" }}>Internet Banking Login</a>
+          <a
+            href="https://ibank.mugangasacco.rw/"
+            className="btn-outline-green"
+            style={{ padding: "7px 16px", fontSize: "0.8rem" }}
+            onClick={() => captureEvent("internet_banking_opened", { source: "desktop_navigation" })}
+          >Internet Banking Login</a>
         </div>
 
         {/* Hamburger - visible only on mobile via CSS media query */}
@@ -297,7 +303,12 @@ export default function Navbar() {
             </div>
           </div>
           <div style={{ display: "flex", gap: 10, paddingTop: 8 }}>
-            <a href="https://ibank.mugangasacco.rw/" className="btn-outline-green" style={{ flex: 1, textAlign: "center" }}>Internet Banking Login</a>
+            <a
+              href="https://ibank.mugangasacco.rw/"
+              className="btn-outline-green"
+              style={{ flex: 1, textAlign: "center" }}
+              onClick={() => captureEvent("internet_banking_opened", { source: "mobile_navigation" })}
+            >Internet Banking Login</a>
           </div>
         </div>
       )}

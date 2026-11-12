@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { captureEvent, captureException } from "../../lib/posthog.js";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 const API_ORIGIN = API_BASE.replace(/\/api\/?$/, "");
@@ -255,6 +256,7 @@ export default function Careers() {
           );
         }
       } catch (err) {
+        captureException(err, { flow: "careers_list_loading" });
         console.error("Failed to fetch careers:", err);
       } finally {
         setLoaded(true);
@@ -291,6 +293,7 @@ export default function Careers() {
         });
       }
     } catch (err) {
+      captureException(err, { flow: "career_details_loading", job_id: job.id });
       console.error("Failed to fetch job detail:", err);
       setSelectedJob((prev) => prev ? { ...prev, _loading: false } : null);
     } finally {
@@ -441,7 +444,15 @@ export default function Careers() {
 
                   <button
                     className="job-modal-apply"
-                    onClick={() => { setSelectedJob(null); navigate(`/apply/${selectedJob.id}`); }}
+                    onClick={() => {
+                      captureEvent("career_application_started", {
+                        job_id: selectedJob.id,
+                        employment_type: selectedJob.type,
+                        source: "job_details_main",
+                      });
+                      setSelectedJob(null);
+                      navigate(`/apply/${selectedJob.id}`);
+                    }}
                   >
                     Apply Now
                   </button>
@@ -487,7 +498,15 @@ export default function Careers() {
                   )}
                   <button
                     className="job-modal-apply jms-apply-btn"
-                    onClick={() => { setSelectedJob(null); navigate(`/apply/${selectedJob.id}`); }}
+                    onClick={() => {
+                      captureEvent("career_application_started", {
+                        job_id: selectedJob.id,
+                        employment_type: selectedJob.type,
+                        source: "job_details_sidebar",
+                      });
+                      setSelectedJob(null);
+                      navigate(`/apply/${selectedJob.id}`);
+                    }}
                   >
                     Apply Now
                   </button>
