@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { captureEvent } from "../../lib/posthog.js";
 
 const GREEN = "#287C3D";
 const GREEN_DARK = "#1f6030";
@@ -35,6 +36,7 @@ export default function SuggestionBox() {
   const handleSubmit = () => {
     const e = validate();
     if (Object.keys(e).length > 0) { setErrors(e); return; }
+    captureEvent("suggestion_submitted", { source: "online_suggestion_box" });
     setSubmitted(true);
   };
 

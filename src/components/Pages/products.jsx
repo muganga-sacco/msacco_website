@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FileText } from "lucide-react";
+import { captureEvent } from "../../lib/posthog.js";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 const API_ORIGIN = API_BASE.replace(/\/api\/?$/, "");
@@ -377,7 +378,15 @@ export default function Products() {
                     <span className="rate-label">{p.rateLabel || "Annual Interest"}</span>
                   </div>
                 ) : null} */}
-                <button className={`cta-btn ${type}`} onClick={() => setSelectedProduct(p)}>{p.cta}</button>
+                <button className={`cta-btn ${type}`} onClick={() => {
+                  captureEvent("product_details_viewed", {
+                    product_id: p.id,
+                    product_title: p.title,
+                    product_type: type,
+                    is_featured: isFeatured,
+                  });
+                  setSelectedProduct(p);
+                }}>{p.cta}</button>
               </div>
             );
           })}
@@ -397,7 +406,11 @@ export default function Products() {
             ))}
           </div>
           {/* <button className={`start-btn ${type}`}>Start Application</button> */}
-          <a href="https://ibank.mugangasacco.rw/" className={`start-btn ${type}`}>Start Application</a>
+          <a
+            href="https://ibank.mugangasacco.rw/"
+            className={`start-btn ${type}`}
+            onClick={() => captureEvent("loan_application_started", { product_type: type, source: "products_page" })}
+          >Start Application</a>
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { captureEvent, captureException, logError, logInfo } from "../../lib/posthog.js";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 
@@ -131,8 +132,23 @@ export default function CareerApply() {
       const r = await fetch(`${API_BASE}/careers/apply`, { method: "POST", body: fd });
       const j = await r.json();
       if (!j.success) throw new Error(j.message || "Submission failed");
+      captureEvent("career_application_submitted", {
+        job_id: jobId,
+        employment_type: job?.employment_type,
+      });
+      logInfo("career application submission completed", {
+        flow: "career_application_submission",
+        status: "success",
+        job_id: jobId,
+      });
       setSubmitted(true);
     } catch (err) {
+      captureException(err, { flow: "career_application_submission", job_id: jobId });
+      logError("career application submission completed", {
+        flow: "career_application_submission",
+        status: "failed",
+        job_id: jobId,
+      });
       setErrors({ submit: err.message });
     } finally {
       setSubmitting(false);

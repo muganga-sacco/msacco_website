@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { captureEvent, captureException, logError, logInfo } from "../../lib/posthog.js";
 
 // ══════════════════════════════════════════════════════════════════════════
 //  ICONS
@@ -159,10 +160,21 @@ export default function ContactPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to send message");
+      captureEvent("contact_message_submitted", { subject_category: form.subject });
+      logInfo("contact submission completed", {
+        flow: "contact_message_submission",
+        status: "success",
+        subject_category: form.subject,
+      });
       setSuccess(true);
       setToast(true);
       setForm({ fname: "", lname: "", email: "", phone: "", subject: "", message: "" });
     } catch (err) {
+      captureException(err, { flow: "contact_message_submission" });
+      logError("contact submission completed", {
+        flow: "contact_message_submission",
+        status: "failed",
+      });
       setErrors(e => ({ ...e, _general: err.message }));
     } finally {
       setLoading(false);

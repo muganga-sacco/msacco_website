@@ -4,6 +4,7 @@ import {
   FileText, Search, Download,
 } from "lucide-react";
 import logo from "/src/Images/mugangaSaccoLogo.jpg";
+import { captureEvent } from "../../lib/posthog.js";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 
@@ -30,7 +31,14 @@ function FormCard({ title, file_url }) {
         </div>
       </div>
       <div style={styles.cardMeta}>
-        <a href={file_url} download target="_blank" rel="noreferrer" style={styles.downloadBtn}>
+        <a
+          href={file_url}
+          download
+          target="_blank"
+          rel="noreferrer"
+          style={styles.downloadBtn}
+          onClick={() => captureEvent("form_downloaded", { form_title: title })}
+        >
           <Download size={14} strokeWidth={2.5} /> Download
         </a>
       </div>
