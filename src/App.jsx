@@ -30,7 +30,6 @@ import Membership from "./components/Pages/membership";
 import Terms from "./components/Pages/terms";
 import Tariff from "./components/Pages/tariff";
 import ExamResultViewer from "./components/Pages/ExamResultViewer";
-import IntumwaChatWidget from "./components/chat/IntumwaChatWidget";
 
 // Home page content only
 function Home() {
@@ -66,7 +65,6 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
-      <IntumwaChatWidget />
     </Router>
   );
 }
