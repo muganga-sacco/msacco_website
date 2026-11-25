@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { NAV_LINKS } from "../../constants";
 import { useScrolled } from "../../hooks/useScrolled";
 import { Link, useNavigate } from "react-router-dom";
+import { publicUrl } from "../../utils/publicUrl";
 
 const UKFlag = () => (
   <svg viewBox="0 0 60 30" width="20" height="13">
@@ -103,7 +104,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
-          <img src="/mugangaSaccoLogo.jpg" alt="Muganga SACCO" style={{ height: 40, width: "auto" }} />
+          <img src={publicUrl("mugangaSaccoLogo.jpg")} alt="Muganga SACCO" style={{ height: 40, width: "auto" }} />
         </Link>
 
         {/* Desktop Nav */}

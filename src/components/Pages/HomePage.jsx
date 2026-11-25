@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { publicUrl } from "../../utils/publicUrl";
 import {
   Home, Briefcase, PlusCircle, Globe, Smartphone, CreditCard,
   ArrowRight, CheckCircle2, TrendingUp,
@@ -162,7 +163,7 @@ export default function HomePage(){
 
         {/* Right — hero video */}
         <div style={{ position:"relative", width:"100%", height:"100%", overflow:"hidden" }}>
-          <video src="/InternetBanking_vid.mp4" autoPlay muted loop playsInline style={{ width:"100%", height:"100%", objectFit:"cover", display:"block", position:"absolute", inset:0 }} />
+          <video src={publicUrl("InternetBanking_vid.mp4")} autoPlay muted loop playsInline style={{ width:"100%", height:"100%", objectFit:"cover", display:"block", position:"absolute", inset:0 }} />
           <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,.45)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
             <div style={{ position:"relative", width:"100%", maxWidth:360, textAlign:"center", padding:"0 24px" }}>
               {SLIDES.map((s, i) => (

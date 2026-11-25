@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { publicUrl } from "../../utils/publicUrl";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 const API_ORIGIN = API_BASE.replace(/\/api\/?$/, "");
@@ -135,7 +136,7 @@ export default function DigitalBanking() {
             </div>
           </div>
           <div className="hero-img-wrap">
-            <img src="/rotated_phone_dialer_v4.png" alt="Mobile banking" style={{ width:"100%", maxWidth:380, height:240, objectFit:"cover", borderRadius:16 }} />
+            <img src={publicUrl("rotated_phone_dialer_v4.png")} alt="Mobile banking" style={{ width:"100%", maxWidth:380, height:240, objectFit:"cover", borderRadius:16 }} />
           </div>
         </div>
       </div>

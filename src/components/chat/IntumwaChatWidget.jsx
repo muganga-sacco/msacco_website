@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { createChatSessionId, sendIntumwaMessage } from "../../services/intumwa";
+import { publicUrl } from "../../utils/publicUrl";
 import "../../styles/intumwa-chat.css";
 
 const LANGUAGE_OPTIONS = [
@@ -317,7 +318,7 @@ export default function IntumwaChatWidget() {
           <ArrowLeft size={20} />
         </button>
         <div className="intumwa-header-avatar">
-          <img src="/mugangaSaccoLogo.jpg" alt="" />
+          <img src={publicUrl("mugangaSaccoLogo.jpg")} alt="" />
         </div>
         <div className="intumwa-header-info">
           <div className="intumwa-header-title">INTUMWA · Muganga SACCO</div>

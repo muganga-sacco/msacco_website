@@ -1,3 +1,5 @@
+import { publicUrl } from "../../utils/publicUrl";
+
 const LOAN_COLOR = "#1a4a2e";
 
 
@@ -19,12 +21,12 @@ export default function Tariff() {
           </p>
         </div>
         <div className="tariff-grid">
-          <a href="/NEW-TARRIFS-2023-Approved-by-BoD_July-2023.pdf" target="_blank" rel="noopener noreferrer" className="tariff-card">
+          <a href={publicUrl("NEW-TARRIFS-2023-Approved-by-BoD_July-2023.pdf")} target="_blank" rel="noopener noreferrer" className="tariff-card">
             <div className="tariff-icon">📄</div>
             <div className="tariff-title">General Tariff</div>
             <div className="tariff-arrow">View →</div>
           </a>
-          <a href="/Giriwawe-Loan-New-Tarrifs-and-Terms-Conditions-from-June-1st2025.pdf" target="_blank" rel="noopener noreferrer" className="tariff-card">
+          <a href={publicUrl("Giriwawe-Loan-New-Tarrifs-and-Terms-Conditions-from-June-1st2025.pdf")} target="_blank" rel="noopener noreferrer" className="tariff-card">
             <div className="tariff-icon">📄</div>
             <div className="tariff-title">GIRIWAWE Tariff</div>
             <div className="tariff-arrow">View →</div>

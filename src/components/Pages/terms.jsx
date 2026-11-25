@@ -1,3 +1,5 @@
+import { publicUrl } from "../../utils/publicUrl";
+
 const LOAN_COLOR = "#1a4a2e";
 
 
@@ -13,7 +15,7 @@ export default function Terms() {
       </div>
 
       <div style={{ textAlign:"center", paddingTop:40, marginBottom:24 }}>
-        <a href="/Terms-Conditions-for-using-mobile-and-Internet-banking.pdf" target="_blank" rel="noopener noreferrer" style={{ display:"inline-block", padding:"14px 36px", background:LOAN_COLOR, color:"#fff", borderRadius:9, fontFamily:"'Source Sans 3', sans-serif", fontSize:"1rem", fontWeight:600, textDecoration:"none", letterSpacing:"0.3px", transition:"opacity 0.18s ease" }} onMouseOver={e => e.target.style.opacity="0.88"} onMouseOut={e => e.target.style.opacity="1"}>Download PDF (English)</a>
+        <a href={publicUrl("Terms-Conditions-for-using-mobile-and-Internet-banking.pdf")} target="_blank" rel="noopener noreferrer" style={{ display:"inline-block", padding:"14px 36px", background:LOAN_COLOR, color:"#fff", borderRadius:9, fontFamily:"'Source Sans 3', sans-serif", fontSize:"1rem", fontWeight:600, textDecoration:"none", letterSpacing:"0.3px", transition:"opacity 0.18s ease" }} onMouseOver={e => e.target.style.opacity="0.88"} onMouseOut={e => e.target.style.opacity="1"}>Download PDF (English)</a>
       </div>
 
       <div className="ms-content ms-animate">

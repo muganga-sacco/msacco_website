@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { publicUrl } from "../../utils/publicUrl";
 import { FOOTER_QUICK_LINKS, FOOTER_SERVICES, CONTACT_INFO, IMPORTANT_INFO } from "../../constants";
 
 const FacebookIcon = () => (
@@ -69,7 +70,7 @@ export default function Footer() {
           {/* Brand */}
           <div style={{color:"#000", textAlign: "center"}}>
             <div style={{ marginBottom: 16 }}>
-              <img src="/mugangaSaccoLogo.jpg" alt="Muganga SACCO" style={{ height: 60, width: "auto" }} />
+              <img src={publicUrl("mugangaSaccoLogo.jpg")} alt="Muganga SACCO" style={{ height: 60, width: "auto" }} />
             </div>
             <p style={{ fontSize: "0.86rem", lineHeight: 1.75, maxWidth: 270, margin: "0 auto 16px" }}>
               Empowering health sector professionals with trusted microfinance solutions.

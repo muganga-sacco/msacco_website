@@ -30,7 +30,7 @@ export default function About() {
               to low-rate loans that support our members and their institutions.
             </p>
             <div className="hero-actions">
-              <a className="profile-btn primary" href="/products">Explore Products</a>
+              <a className="profile-btn primary" href={`${import.meta.env.BASE_URL}products`}>Explore Products</a>
               <a className="profile-btn secondary" href="#profile-history">Read Our Story</a>
             </div>
           </div>
